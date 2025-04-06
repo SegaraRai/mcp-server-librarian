@@ -154,6 +154,24 @@ Document 2 content
 ======
 ```
 
+### getDocument
+
+Retrieves a specific document by path.
+
+**Parameters:**
+
+- `filepath`: The path to the document
+
+**Response:**
+
+```text
+**/path/to/document.md**
+- tags: tag1, tag2, tag3
+======
+Document content
+======
+```
+
 ### listDocuments
 
 Lists all documents with optional filtering by directory and tags.
@@ -216,48 +234,6 @@ Searches document content using string or regex patterns.
 ```
 
 **Response:** (When `includeContents` is true)
-
-```text
-**/path/to/document1.md**
-- tags: tag1, tag2, tag3
-======
-Document 1 content
-======
-
-**/path/to/document2.md**
-- tags: tag1, tag4, tag5
-======
-Document 2 content
-======
-```
-
-### getDocument
-
-Retrieves a specific document by path.
-
-**Parameters:**
-
-- `filepath`: The path to the document
-
-**Response:**
-
-```text
-**/path/to/document.md**
-- tags: tag1, tag2, tag3
-======
-Document content
-======
-```
-
-### getDocuments
-
-Retrieves multiple documents by their paths.
-
-**Parameters:**
-
-- `filepaths`: The array of file paths to retrieve
-
-**Response:**
 
 ```text
 **/path/to/document1.md**
@@ -475,3 +451,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+90% vibe coded. This code quality is not mine. I can write better code much more slowly :)
