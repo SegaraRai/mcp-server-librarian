@@ -20,24 +20,29 @@ describe("formatDocumentList", () => {
     ];
 
     const result = formatDocumentList(docs);
-    expect(result).toBe(
-      "- /path/to/doc1.md\n  - tags: tag1, tag2\n" +
-        "- /path/to/doc2.md\n  - tags: tag2, tag3",
-    );
+    expect(result).toMatchInlineSnapshot(`
+      "- /path/to/doc1.md
+        - tags: tag1, tag2
+      - /path/to/doc2.md
+        - tags: tag2, tag3"
+    `);
   });
 
   it("should handle documents with empty tags", () => {
     const docs: Document[] = [{ filepath: "/path/to/doc1.md", tags: [] }];
 
     const result = formatDocumentList(docs);
-    expect(result).toBe("- /path/to/doc1.md\n  - tags: ");
+    expect(result).toMatchInlineSnapshot(`
+      "- /path/to/doc1.md
+        - tags: (no tags)"
+    `);
   });
 });
 
 describe("formatDocumentListWithContents", () => {
   it("should format an empty document list", () => {
     const result = formatDocumentListWithContents([]);
-    expect(result).toBe("No documents found.");
+    expect(result).toMatchInlineSnapshot(`"No documents found."`);
   });
 
   it("should format a list of documents with contents", () => {
@@ -55,17 +60,32 @@ describe("formatDocumentListWithContents", () => {
     ];
 
     const result = formatDocumentListWithContents(docs);
-    expect(result).toBe(
-      "**/path/to/doc1.md**\n======\nContent of doc1\n======\n\n" +
-        "**/path/to/doc2.md**\n======\nContent of doc2\n======",
-    );
+    expect(result).toMatchInlineSnapshot(`
+      "**/path/to/doc1.md**
+      - tags: tag1, tag2
+      ======
+      Content of doc1
+      ======
+
+      **/path/to/doc2.md**
+      - tags: tag2, tag3
+      ======
+      Content of doc2
+      ======"
+    `);
   });
 
   it("should handle documents with undefined contents", () => {
     const docs: Document[] = [{ filepath: "/path/to/doc1.md", tags: ["tag1"] }];
 
     const result = formatDocumentListWithContents(docs);
-    expect(result).toBe("**/path/to/doc1.md**\n======\n\n======");
+    expect(result).toMatchInlineSnapshot(`
+      "**/path/to/doc1.md**
+      - tags: tag1
+      ======
+
+      ======"
+    `);
   });
 });
 
@@ -78,9 +98,13 @@ describe("formatDocument", () => {
     };
 
     const result = formatDocument(doc);
-    expect(result).toBe(
-      "**/path/to/doc.md**\n======\nDocument content\n======",
-    );
+    expect(result).toMatchInlineSnapshot(`
+      "**/path/to/doc.md**
+      - tags: tag1, tag2
+      ======
+      Document content
+      ======"
+    `);
   });
 
   it("should handle a document with undefined contents", () => {
@@ -90,14 +114,20 @@ describe("formatDocument", () => {
     };
 
     const result = formatDocument(doc);
-    expect(result).toBe("**/path/to/doc.md**\n======\n\n======");
+    expect(result).toMatchInlineSnapshot(`
+      "**/path/to/doc.md**
+      - tags: tag1, tag2
+      ======
+
+      ======"
+    `);
   });
 });
 
 describe("formatTagList", () => {
   it("should format an empty tag list", () => {
     const result = formatTagList([]);
-    expect(result).toBe("No tags found.");
+    expect(result).toMatchInlineSnapshot(`"No tags found."`);
   });
 
   it("should format a list of tags without filepaths", () => {
@@ -108,7 +138,11 @@ describe("formatTagList", () => {
     ];
 
     const result = formatTagList(tags);
-    expect(result).toBe("- tag1 (5)\n" + "- tag2 (3)\n" + "- tag3 (1)");
+    expect(result).toMatchInlineSnapshot(`
+      "- tag1 (5)
+      - tag2 (3)
+      - tag3 (1)"
+    `);
   });
 
   it("should format a list of tags with filepaths", () => {
@@ -126,21 +160,19 @@ describe("formatTagList", () => {
     ];
 
     const result = formatTagList(tags);
-    expect(result).toBe(
-      "- tag1 (2)\n" +
-        "  - files:\n" +
-        "    - /path/to/doc1.md\n" +
-        "    - /path/to/doc2.md\n" +
-        "- tag2 (1)\n" +
-        "  - files:\n" +
-        "    - /path/to/doc1.md",
-    );
+    expect(result).toMatchInlineSnapshot(`
+      "- tag1 (2)
+        - /path/to/doc1.md
+        - /path/to/doc2.md
+      - tag2 (1)
+        - /path/to/doc1.md"
+    `);
   });
 
   it("should handle tags with empty filepaths array", () => {
     const tags = [{ tag: "tag1", count: 0, filepaths: [] }];
 
     const result = formatTagList(tags);
-    expect(result).toBe("- tag1 (0)");
+    expect(result).toMatchInlineSnapshot(`"- tag1 (0)"`);
   });
 });
