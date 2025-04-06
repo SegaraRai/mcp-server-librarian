@@ -17,8 +17,8 @@ import {
  * Input schema for listDocuments
  */
 export const listDocumentsSchema = z.object({
-  directory: z.string().default("/"),
-  tags: z.array(z.string()).default([]),
+  directory: z.string().default("/").describe("The directory path to list documents from"),
+  tags: z.array(z.string()).default([]).describe("Tags to filter documents by"),
 });
 
 /**
@@ -30,10 +30,10 @@ export type ListDocumentsParams = z.infer<typeof listDocumentsSchema>;
  * Input schema for searchDocuments
  */
 export const searchDocumentsSchema = z.object({
-  query: z.string(),
-  directory: z.string().default("/"),
-  tags: z.array(z.string()).default([]),
-  includeContents: z.boolean().default(false),
+  query: z.string().describe("The search query string"),
+  directory: z.string().default("/").describe("The directory path to search documents in"),
+  tags: z.array(z.string()).default([]).describe("Tags to filter search results by"),
+  includeContents: z.boolean().default(false).describe("Whether to include document contents in results"),
 });
 
 /**
@@ -45,7 +45,7 @@ export type SearchDocumentsParams = z.infer<typeof searchDocumentsSchema>;
  * Input schema for getDocument
  */
 export const getDocumentSchema = z.object({
-  filepath: z.string(),
+  filepath: z.string().describe("The file path of the document to retrieve"),
 });
 
 /**
@@ -57,8 +57,8 @@ export type GetDocumentParams = z.infer<typeof getDocumentSchema>;
  * Input schema for listTags
  */
 export const listTagsSchema = z.object({
-  directory: z.string().default("/"),
-  includeFilepaths: z.boolean().default(false),
+  directory: z.string().default("/").describe("The directory path to list tags from"),
+  includeFilepaths: z.boolean().default(false).describe("Whether to include file paths for each tag"),
 });
 
 /**
