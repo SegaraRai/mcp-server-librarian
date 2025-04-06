@@ -4,10 +4,13 @@
   "description": "",
   "main": "dist/index.js",
   "type": "module",
+  "bin": {
+    "librarian": "dist/bin.js"
+  },
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "tsc && node dist/index.js"
+    "start": "node dist/bin.js",
+    "dev": "tsc && node dist/bin.js"
   },
   "keywords": [],
   "author": "",
