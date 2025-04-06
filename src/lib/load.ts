@@ -232,24 +232,35 @@ export function searchDocuments(
   directory: string = "/",
   tags: string[] = [],
   includeContents: boolean = false,
+  mode: "string" | "regex" = "string",
+  caseSensitive: boolean = false,
 ): Document[] {
   // First filter by directory and tags
   const filtered = filterDocuments(cache, directory, tags);
 
-  // Create regex from query
-  let regex: RegExp;
-  try {
-    // Default to case-insensitive global matching
-    regex = new RegExp(query, "gim");
-  } catch (error) {
-    // If invalid regex, treat as a plain string
+  // Create regex flags based on parameters
+  const flags = caseSensitive ? "g" : "gi";
+  
+  // Create regex pattern based on mode
+  let pattern: RegExp;
+  if (mode === "string") {
+    // Escape special characters for string mode
     const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    regex = new RegExp(escapedQuery, "gim");
+    pattern = new RegExp(escapedQuery, flags);
+  } else {
+    // Use query directly as regex pattern
+    try {
+      pattern = new RegExp(query, flags);
+    } catch (error) {
+      // If invalid regex, treat as a plain string
+      const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      pattern = new RegExp(escapedQuery, flags);
+    }
   }
 
   // Search in document contents
   const results = filtered.filter(
-    (doc) => doc.contents && regex.test(doc.contents),
+    (doc) => doc.contents && pattern.test(doc.contents)
   );
 
   // Remove contents if not requested

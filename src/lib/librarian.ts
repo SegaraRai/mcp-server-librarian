@@ -19,6 +19,7 @@ import {
 export const listDocumentsSchema = z.object({
   directory: z.string().default("/").describe("The directory path to list documents from"),
   tags: z.array(z.string()).default([]).describe("Tags to filter documents by"),
+  includeContents: z.boolean().optional().default(false).describe("Whether to include document contents in results"),
 });
 
 /**
@@ -31,9 +32,11 @@ export type ListDocumentsParams = z.infer<typeof listDocumentsSchema>;
  */
 export const searchDocumentsSchema = z.object({
   query: z.string().describe("The search query string"),
+  mode: z.enum(["string", "regex"]).optional().default("string").describe("Search mode (string or regex)"),
+  caseSensitive: z.boolean().optional().default(false).describe("Whether the search should be case-sensitive"),
   directory: z.string().default("/").describe("The directory path to search documents in"),
   tags: z.array(z.string()).default([]).describe("Tags to filter search results by"),
-  includeContents: z.boolean().default(false).describe("Whether to include document contents in results"),
+  includeContents: z.boolean().optional().default(false).describe("Whether to include document contents in results"),
 });
 
 /**
@@ -107,23 +110,35 @@ export class Librarian {
    * List documents with optional filtering by directory and tags
    */
   async listDocuments(params: ListDocumentsParams): Promise<Document[]> {
-    const { directory, tags } = params;
+    const { directory, tags, includeContents } = params;
     const cache = await this.ensureDocumentsLoaded();
 
     const documents = filterDocuments(cache, directory, tags);
 
-    // Remove contents to keep response size small
-    return documents.map(({ contents, ...rest }) => rest);
+    // Remove contents if not requested
+    if (!includeContents) {
+      return documents.map(({ contents, ...rest }) => rest);
+    }
+    
+    return documents;
   }
 
   /**
    * Search documents using string or regex patterns
    */
   async searchDocuments(params: SearchDocumentsParams): Promise<Document[]> {
-    const { query, directory, tags, includeContents } = params;
+    const { query, mode, caseSensitive, directory, tags, includeContents } = params;
     const cache = await this.ensureDocumentsLoaded();
 
-    return searchDocs(cache, query, directory, tags, includeContents);
+    return searchDocs(
+      cache,
+      query,
+      directory,
+      tags,
+      includeContents,
+      mode,
+      caseSensitive
+    );
   }
 
   /**

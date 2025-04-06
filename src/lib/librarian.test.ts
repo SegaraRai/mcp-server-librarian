@@ -100,6 +100,7 @@ describe("Librarian", () => {
       const result = await librarian.listDocuments({
         directory: "/",
         tags: [],
+        includeContents: false,
       });
 
       // Verify loadAllDocuments was called
@@ -122,6 +123,7 @@ describe("Librarian", () => {
       const result = await librarian.listDocuments({
         directory: "/",
         tags: ["tag1"],
+        includeContents: false,
       });
 
       // Verify the result only includes documents with tag1
@@ -134,6 +136,8 @@ describe("Librarian", () => {
     it("should call loadAllDocuments and searchDocuments", async () => {
       const result = await librarian.searchDocuments({
         query: "doc1",
+        mode: "string",
+        caseSensitive: false,
         directory: "/",
         tags: [],
         includeContents: false,
@@ -156,6 +160,8 @@ describe("Librarian", () => {
     it("should include contents when requested", async () => {
       const result = await librarian.searchDocuments({
         query: "doc1",
+        mode: "string",
+        caseSensitive: false,
         directory: "/",
         tags: [],
         includeContents: true,
@@ -238,7 +244,7 @@ describe("Librarian", () => {
       const loadSpy = vi.spyOn(loadModule, "loadAllDocuments");
 
       // Call a method to load the cache
-      await testLibrarian.listDocuments({ directory: "/", tags: [] });
+      await testLibrarian.listDocuments({ directory: "/", tags: [], includeContents: false });
 
       // Verify loadAllDocuments was called
       expect(loadSpy).toHaveBeenCalledTimes(1);
@@ -249,6 +255,8 @@ describe("Librarian", () => {
       // Call another method - should not call loadAllDocuments again
       await testLibrarian.searchDocuments({
         query: "doc1",
+        mode: "string",
+        caseSensitive: false,
         directory: "/",
         tags: [],
         includeContents: false,
@@ -261,7 +269,7 @@ describe("Librarian", () => {
       await testLibrarian.reloadDocuments();
 
       // Call a method again
-      await testLibrarian.listDocuments({ directory: "/", tags: [] });
+      await testLibrarian.listDocuments({ directory: "/", tags: [], includeContents: false });
 
       // Verify loadAllDocuments was called again
       expect(loadSpy).toHaveBeenCalledTimes(1);
