@@ -27,18 +27,14 @@ export function formatDocumentListWithContents(documents: Document[]): string {
     return "No documents found.";
   }
 
-  return documents
-    .map((doc) => {
-      return `**${doc.filepath}**\n======\n${doc.contents || ""}\n======`;
-    })
-    .join("\n\n");
+  return documents.map((doc) => formatDocument(doc)).join("\n\n");
 }
 
 /**
  * Format a single document as plaintext
  */
 export function formatDocument(document: Document): string {
-  return `**${document.filepath}**\n======\n${document.contents || ""}\n======`;
+  return `**${document.filepath}**\n======\n${document.contents ?? ""}\n======`;
 }
 
 /**

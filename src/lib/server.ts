@@ -40,7 +40,7 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
         const documents = await librarian.listDocuments(args);
 
         // Format the response based on whether contents are included
-        const formattedText = documents.some((doc) => doc.contents)
+        const formattedText = documents.some((doc) => doc.contents != null)
           ? formatDocumentListWithContents(documents)
           : formatDocumentList(documents);
 
@@ -76,7 +76,7 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
         const results = await librarian.searchDocuments(args);
 
         // Format the response based on whether contents are included
-        const formattedText = results.some((doc) => doc.contents)
+        const formattedText = results.some((doc) => doc.contents != null)
           ? formatDocumentListWithContents(results)
           : formatDocumentList(results);
 
