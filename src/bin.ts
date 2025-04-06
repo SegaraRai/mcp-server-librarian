@@ -4,6 +4,7 @@
  * Command-line entry point for the Librarian MCP server
  */
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import * as process from "node:process";
 import { checkDocsRootExists, getConfig } from "./lib/config.js";
 import { createLibrarianServer } from "./lib/server.js";
 

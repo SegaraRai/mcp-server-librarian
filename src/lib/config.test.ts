@@ -3,9 +3,18 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { checkDocsRootExists, getConfig, LibrarianConfig } from "./config.js";
 
 // Mock process.argv and process.env
-vi.mock("process", () => ({
-  argv: ["node", "script.js"],
-  env: {},
+const { getArgv, getEnv } = vi.hoisted(() => ({
+  getArgv: vi.fn(() => ["node", "script.js"]),
+  getEnv: vi.fn(() => ({})),
+}));
+
+vi.mock("node:process", () => ({
+  get argv() {
+    return getArgv();
+  },
+  get env() {
+    return getEnv();
+  },
 }));
 
 // Mock fs functions
@@ -17,14 +26,18 @@ vi.mock("node:fs", () => ({
 // Reset mocks after each test
 afterEach(() => {
   vi.resetAllMocks();
-  process.argv = ["node", "script.js"];
-  process.env = {};
+  vi.unstubAllEnvs();
 });
 
 describe("getConfig", () => {
   it("should use command line arguments when provided", () => {
     // Setup command line arguments
-    process.argv = ["node", "script.js", "--docs-root", "/custom/docs/path"];
+    getArgv.mockReturnValue([
+      "node",
+      "script.js",
+      "--docs-root",
+      "/custom/docs/path",
+    ]);
 
     const config = getConfig();
     expect(config.docsRoot).toBe("/custom/docs/path");
@@ -32,7 +45,9 @@ describe("getConfig", () => {
 
   it("should use environment variable when command line arguments are not provided", () => {
     // Setup environment variable
-    process.env.LIBRARIAN_DOCS_ROOT = "/env/docs/path";
+    getEnv.mockReturnValue({
+      LIBRARIAN_DOCS_ROOT: "/env/docs/path",
+    });
 
     const config = getConfig();
     expect(config.docsRoot).toBe("/env/docs/path");

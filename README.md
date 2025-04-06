@@ -140,17 +140,17 @@ Retrieves multiple documents by their paths.
 
 **Response:**
 
-```
+```text
 **/path/to/document1.md**
 - tags: tag1, tag2, tag3
 ======
-Document 1 content with frontmatter
+Document 1 content
 ======
 
 **/path/to/document2.md**
 - tags: tag1, tag4, tag5
 ======
-Document 2 content with frontmatter
+Document 2 content
 ======
 ```
 
@@ -164,27 +164,30 @@ Lists all documents with optional filtering by directory and tags.
 - `tags` (optional): Array of tags to filter by (default: [])
 - `includeContents` (optional): Whether to include document contents in results (default: false)
 - `depth` (optional): Maximum directory depth to traverse (-1 for infinite, default: -1)
-- `includeContents` (optional): Whether to include document contents in results (default: false)
 
-**Response:**
+**Response:** (When `includeContents` is false)
 
-```
-// When includeContents is false
+```text
 - /path/to/document1.md
   - tags: tag1, tag2, tag3
 - /path/to/document2.md
   - tags: tag1, tag4, tag5
 ...
+```
 
-// When includeContents is true
+**Response:** (When `includeContents` is true)
+
+```text
 **/path/to/document1.md**
+- tags: tag1, tag2, tag3
 ======
-Document 1 content with frontmatter
+Document 1 content
 ======
 
 **/path/to/document2.md**
+- tags: tag1, tag4, tag5
 ======
-Document 2 content with frontmatter
+Document 2 content
 ======
 ```
 
@@ -202,25 +205,29 @@ Searches document content using string or regex patterns.
 - `includeContents` (optional): Whether to include document contents in results (default: false)
 - `depth` (optional): Maximum directory depth to traverse (-1 for infinite, default: -1)
 
-**Response:**
+**Response:** (When `includeContents` is false)
 
-```
-// When includeContents is false
+```text
 - /path/to/document1.md
   - tags: tag1, tag2, tag3
 - /path/to/document2.md
   - tags: tag1, tag4, tag5
 ...
+```
 
-// When includeContents is true
+**Response:** (When `includeContents` is true)
+
+```text
 **/path/to/document1.md**
+- tags: tag1, tag2, tag3
 ======
-Document 1 content with frontmatter
+Document 1 content
 ======
 
 **/path/to/document2.md**
+- tags: tag1, tag4, tag5
 ======
-Document 2 content with frontmatter
+Document 2 content
 ======
 ```
 
@@ -234,10 +241,35 @@ Retrieves a specific document by path.
 
 **Response:**
 
-```
+```text
 **/path/to/document.md**
+- tags: tag1, tag2, tag3
 ======
-Document content with frontmatter
+Document content
+======
+```
+
+### getDocuments
+
+Retrieves multiple documents by their paths.
+
+**Parameters:**
+
+- `filepaths`: The array of file paths to retrieve
+
+**Response:**
+
+```text
+**/path/to/document1.md**
+- tags: tag1, tag2, tag3
+======
+Document 1 content
+======
+
+**/path/to/document2.md**
+- tags: tag1, tag4, tag5
+======
+Document 2 content
 ======
 ```
 
@@ -251,25 +283,25 @@ Lists all tags with counts and optional filepaths.
 - `includeFilepaths` (optional): Whether to include filepaths in results (default: false)
 - `depth` (optional): Maximum directory depth to traverse (-1 for infinite, default: -1)
 
-**Response:**
+**Response:** (When `includeFilepaths` is false)
 
-```
-// When includeFilepaths is false
+```text
 - tag1 (5)
 - tag2 (3)
 - tag3 (2)
 ...
+```
 
-// When includeFilepaths is true
+**Response:** (When `includeFilepaths` is true)
+
+```text
 - tag1 (5)
-  - files:
-    - /path/to/document1.md
-    - /path/to/document2.md
-    - ...
+  - /path/to/document1.md
+  - /path/to/document2.md
+  - ...
 - tag2 (3)
-  - files:
-    - /path/to/document3.md
-    - ...
+  - /path/to/document3.md
+  - ...
 ```
 
 ## Usage Examples
