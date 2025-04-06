@@ -1,21 +1,16 @@
 /**
  * Core Librarian implementation
  */
-import * as fs from 'fs';
-import * as path from 'path';
-import fg from 'fast-glob';
-import matter from 'gray-matter';
 import { z } from 'zod';
 import { LibrarianConfig } from './config.js';
-
-/**
- * Document interface representing a markdown document
- */
-export interface Document {
-  filepath: string;
-  tags: string[];
-  contents?: string;
-}
+import { 
+  Document, 
+  DocumentCache, 
+  loadAllDocuments, 
+  filterDocuments, 
+  searchDocuments as searchDocs, 
+  getDocument as getDoc 
+} from './load.js';
 
 /**
  * Input schema for listDocuments
@@ -62,84 +57,36 @@ export type GetDocumentParams = z.infer<typeof getDocumentSchema>;
  */
 export class Librarian {
   private config: LibrarianConfig;
+  private documentCache: DocumentCache | null = null;
+  private loading: Promise<DocumentCache> | null = null;
 
   constructor(config: LibrarianConfig) {
     this.config = config;
   }
 
   /**
-   * Read a markdown file and parse its frontmatter
+   * Initialize the document cache
    */
-  private readMarkdownFile(filepath: string): Document {
-    const fullPath = path.join(this.config.docsRoot, filepath);
-    
-    if (!fs.existsSync(fullPath)) {
-      throw new Error(`File not found: ${filepath}`);
+  private async ensureDocumentsLoaded(): Promise<DocumentCache> {
+    if (this.documentCache) {
+      return this.documentCache;
     }
-    
-    const fileContent = fs.readFileSync(fullPath, "utf-8");
-    const { data, content } = matter(fileContent);
-    
-    return {
-      filepath,
-      tags: Array.isArray(data.tags) ? data.tags : [],
-      contents: content
-    };
+
+    if (!this.loading) {
+      this.loading = loadAllDocuments(this.config.docsRoot);
+    }
+
+    this.documentCache = await this.loading;
+    return this.documentCache;
   }
 
   /**
-   * Get inherited tags from parent directories
+   * Reload all documents (useful if files have changed)
    */
-  private getInheritedTags(filepath: string): string[] {
-    const parts = filepath.split("/").filter(Boolean);
-    const allTags: string[] = [];
-    
-    // Start from root and traverse down the path
-    let currentPath = "";
-    
-    // Check root index.md
-    try {
-      const rootIndexPath = "index.md";
-      if (fs.existsSync(path.join(this.config.docsRoot, rootIndexPath))) {
-        const { data } = matter(fs.readFileSync(path.join(this.config.docsRoot, rootIndexPath), "utf-8"));
-        if (Array.isArray(data.tags)) {
-          allTags.push(...data.tags);
-        }
-      }
-    } catch (error) {
-      console.error(`Error reading root index.md:`, error);
-    }
-    
-    // Check each directory level
-    for (let i = 0; i < parts.length - 1; i++) {
-      currentPath = currentPath ? `${currentPath}/${parts[i]}` : parts[i];
-      
-      try {
-        const indexPath = `${currentPath}/index.md`;
-        if (fs.existsSync(path.join(this.config.docsRoot, indexPath))) {
-          const { data } = matter(fs.readFileSync(path.join(this.config.docsRoot, indexPath), "utf-8"));
-          if (Array.isArray(data.tags)) {
-            allTags.push(...data.tags);
-          }
-        }
-      } catch (error) {
-        console.error(`Error reading ${currentPath}/index.md:`, error);
-      }
-    }
-    
-    // Remove duplicates
-    return [...new Set(allTags)];
-  }
-
-  /**
-   * Enrich a document with inherited tags
-   */
-  private enrichDocumentWithTags(doc: Document): Document {
-    const inheritedTags = this.getInheritedTags(doc.filepath);
-    return {
-      ...doc,
-      tags: [...new Set([...inheritedTags, ...doc.tags])]
-    };
+  async reloadDocuments(): Promise<void> {
+    this.documentCache = null;
+    this.loading = null;
+    await this.ensureDocumentsLoaded();
   }
 
   /**
@@ -147,33 +94,12 @@ export class Librarian {
    */
   async listDocuments(params: ListDocumentsParams): Promise<Document[]> {
     const { directory, tags } = params;
-    const normalizedDir = directory.startsWith("/") ? directory.substring(1) : directory;
-    const pattern = `${normalizedDir === "/" ? "" : normalizedDir + "/"}**/*.md`;
+    const cache = await this.ensureDocumentsLoaded();
     
-    const files = await fg(pattern, {
-      cwd: this.config.docsRoot,
-      ignore: ["**/node_modules/**"]
-    });
+    const documents = filterDocuments(cache, directory, tags);
     
-    const documents: Document[] = [];
-    
-    for (const file of files) {
-      try {
-        const doc = this.readMarkdownFile(file);
-        const enrichedDoc = this.enrichDocumentWithTags(doc);
-        
-        // Filter by tags if specified
-        if (tags.length === 0 || tags.some((tag: string) => enrichedDoc.tags.includes(tag))) {
-          // Remove contents to keep response size small
-          const { contents, ...docWithoutContents } = enrichedDoc;
-          documents.push(docWithoutContents);
-        }
-      } catch (error) {
-        console.error(`Error processing file ${file}:`, error);
-      }
-    }
-    
-    return documents;
+    // Remove contents to keep response size small
+    return documents.map(({ contents, ...rest }) => rest);
   }
 
   /**
@@ -181,51 +107,9 @@ export class Librarian {
    */
   async searchDocuments(params: SearchDocumentsParams): Promise<Document[]> {
     const { query, directory, tags, includeContents } = params;
-    const normalizedDir = directory.startsWith("/") ? directory.substring(1) : directory;
-    const pattern = `${normalizedDir === "/" ? "" : normalizedDir + "/"}**/*.md`;
+    const cache = await this.ensureDocumentsLoaded();
     
-    const files = await fg(pattern, {
-      cwd: this.config.docsRoot,
-      ignore: ["**/node_modules/**"]
-    });
-    
-    const results: Document[] = [];
-    
-    // Determine if query is a regex
-    let regex: RegExp;
-    try {
-      // Default to case-insensitive global matching
-      regex = new RegExp(query, "gim");
-    } catch (error) {
-      // If invalid regex, treat as a plain string
-      const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      regex = new RegExp(escapedQuery, "gim");
-    }
-    
-    for (const file of files) {
-      try {
-        const doc = this.readMarkdownFile(file);
-        const enrichedDoc = this.enrichDocumentWithTags(doc);
-        
-        // Filter by tags if specified
-        if (tags.length === 0 || tags.some((tag: string) => enrichedDoc.tags.includes(tag))) {
-          // Check if content matches the query
-          if (enrichedDoc.contents && regex.test(enrichedDoc.contents)) {
-            if (!includeContents) {
-              // Remove contents to keep response size small
-              const { contents, ...docWithoutContents } = enrichedDoc;
-              results.push(docWithoutContents);
-            } else {
-              results.push(enrichedDoc);
-            }
-          }
-        }
-      } catch (error) {
-        console.error(`Error processing file ${file}:`, error);
-      }
-    }
-    
-    return results;
+    return searchDocs(cache, query, directory, tags, includeContents);
   }
 
   /**
@@ -233,11 +117,8 @@ export class Librarian {
    */
   async getDocument(params: GetDocumentParams): Promise<Document> {
     const { filepath } = params;
-    const normalizedPath = filepath.startsWith("/") ? filepath.substring(1) : filepath;
+    const cache = await this.ensureDocumentsLoaded();
     
-    const doc = this.readMarkdownFile(normalizedPath);
-    const enrichedDoc = this.enrichDocumentWithTags(doc);
-    
-    return enrichedDoc;
+    return getDoc(cache, filepath);
   }
 }
