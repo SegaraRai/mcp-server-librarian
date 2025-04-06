@@ -1,7 +1,7 @@
 /**
  * Configuration module for the Librarian MCP server
  */
-import * as fs from 'fs';
+import * as fs from "fs";
 
 /**
  * Configuration options for the Librarian
@@ -18,23 +18,25 @@ export interface LibrarianConfig {
  */
 export function getConfig(): LibrarianConfig {
   // Check command line arguments first
-  const argIndex = process.argv.findIndex((arg: string) => arg === "--docs-root");
+  const argIndex = process.argv.findIndex(
+    (arg: string) => arg === "--docs-root",
+  );
   if (argIndex !== -1 && process.argv.length > argIndex + 1) {
     return {
-      docsRoot: process.argv[argIndex + 1]
+      docsRoot: process.argv[argIndex + 1],
     };
   }
-  
+
   // Check environment variable next
   if (process.env.LIBRARIAN_DOCS_ROOT) {
     return {
-      docsRoot: process.env.LIBRARIAN_DOCS_ROOT
+      docsRoot: process.env.LIBRARIAN_DOCS_ROOT,
     };
   }
-  
+
   // Default to ./docs
   return {
-    docsRoot: "./docs"
+    docsRoot: "./docs",
   };
 }
 

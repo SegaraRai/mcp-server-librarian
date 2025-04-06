@@ -9,17 +9,17 @@ A custom React hook that provides localStorage integration with React state.
 ## Usage
 
 ```jsx
-import { useLocalStorage } from './hooks/useLocalStorage';
+import { useLocalStorage } from "./hooks/useLocalStorage";
 
 function App() {
-  const [name, setName] = useLocalStorage('name', 'John Doe');
-  
+  const [name, setName] = useLocalStorage("name", "John Doe");
+
   return (
     <div>
       <input
         type="text"
         value={name}
-        onChange={e => setName(e.target.value)}
+        onChange={(e) => setName(e.target.value)}
       />
     </div>
   );
@@ -29,7 +29,7 @@ function App() {
 ## Implementation
 
 ```jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 function useLocalStorage(key, initialValue) {
   // Get stored value from localStorage or use initialValue

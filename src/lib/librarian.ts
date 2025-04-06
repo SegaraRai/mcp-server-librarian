@@ -1,24 +1,24 @@
 /**
  * Core Librarian implementation
  */
-import { z } from 'zod';
-import { LibrarianConfig } from './config.js';
+import { z } from "zod";
+import { LibrarianConfig } from "./config.js";
 import {
   Document,
   DocumentCache,
-  loadAllDocuments,
+  filterDocuments,
+  getDocument as getDoc,
   getTagsInDirectory,
-  filterDocuments, 
-  searchDocuments as searchDocs, 
-  getDocument as getDoc 
-} from './load.js';
+  loadAllDocuments,
+  searchDocuments as searchDocs,
+} from "./load.js";
 
 /**
  * Input schema for listDocuments
  */
 export const listDocumentsSchema = z.object({
   directory: z.string().default("/"),
-  tags: z.array(z.string()).default([])
+  tags: z.array(z.string()).default([]),
 });
 
 /**
@@ -33,7 +33,7 @@ export const searchDocumentsSchema = z.object({
   query: z.string(),
   directory: z.string().default("/"),
   tags: z.array(z.string()).default([]),
-  includeContents: z.boolean().default(false)
+  includeContents: z.boolean().default(false),
 });
 
 /**
@@ -45,7 +45,7 @@ export type SearchDocumentsParams = z.infer<typeof searchDocumentsSchema>;
  * Input schema for getDocument
  */
 export const getDocumentSchema = z.object({
-  filepath: z.string()
+  filepath: z.string(),
 });
 
 /**
@@ -58,7 +58,7 @@ export type GetDocumentParams = z.infer<typeof getDocumentSchema>;
  */
 export const listTagsSchema = z.object({
   directory: z.string().default("/"),
-  includeFilepaths: z.boolean().default(false)
+  includeFilepaths: z.boolean().default(false),
 });
 
 /**
@@ -109,9 +109,9 @@ export class Librarian {
   async listDocuments(params: ListDocumentsParams): Promise<Document[]> {
     const { directory, tags } = params;
     const cache = await this.ensureDocumentsLoaded();
-    
+
     const documents = filterDocuments(cache, directory, tags);
-    
+
     // Remove contents to keep response size small
     return documents.map(({ contents, ...rest }) => rest);
   }
@@ -122,7 +122,7 @@ export class Librarian {
   async searchDocuments(params: SearchDocumentsParams): Promise<Document[]> {
     const { query, directory, tags, includeContents } = params;
     const cache = await this.ensureDocumentsLoaded();
-    
+
     return searchDocs(cache, query, directory, tags, includeContents);
   }
 
@@ -132,17 +132,19 @@ export class Librarian {
   async getDocument(params: GetDocumentParams): Promise<Document> {
     const { filepath } = params;
     const cache = await this.ensureDocumentsLoaded();
-    
+
     return getDoc(cache, filepath);
   }
 
   /**
    * List all tags with counts and optional filepaths
    */
-  async listTags(params: ListTagsParams): Promise<{ tag: string; count: number; filepaths?: string[] }[]> {
+  async listTags(
+    params: ListTagsParams,
+  ): Promise<{ tag: string; count: number; filepaths?: string[] }[]> {
     const { directory, includeFilepaths } = params;
     const cache = await this.ensureDocumentsLoaded();
-    
+
     return getTagsInDirectory(cache, directory, includeFilepaths);
   }
 }
