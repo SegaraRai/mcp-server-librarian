@@ -6,3 +6,4 @@
 export * from './lib/config.js';
 export * from './lib/librarian.js';
 export * from './lib/server.js';
+export * from './lib/util.js';

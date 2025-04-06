@@ -3,6 +3,7 @@
  */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { Librarian, listDocumentsSchema, searchDocumentsSchema, getDocumentSchema, listTagsSchema } from './librarian.js';
+import { formatDocumentList, formatDocumentListWithContents, formatDocument, formatTagList } from './util.js';
 import { LibrarianConfig } from './config.js';
 
 /**
@@ -26,10 +27,15 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
       try {
         const documents = await librarian.listDocuments(args);
         
+        // Format the response based on whether contents are included
+        const formattedText = documents.some(doc => doc.contents)
+          ? formatDocumentListWithContents(documents)
+          : formatDocumentList(documents);
+          
         return {
-          content: [{ 
-            type: "text", 
-            text: JSON.stringify(documents, null, 2)
+          content: [{
+            type: "text",
+            text: formattedText
           }]
         };
       } catch (error: any) {
@@ -53,10 +59,15 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
       try {
         const results = await librarian.searchDocuments(args);
         
+        // Format the response based on whether contents are included
+        const formattedText = results.some(doc => doc.contents)
+          ? formatDocumentListWithContents(results)
+          : formatDocumentList(results);
+          
         return {
-          content: [{ 
-            type: "text", 
-            text: JSON.stringify(results, null, 2)
+          content: [{
+            type: "text",
+            text: formattedText
           }]
         };
       } catch (error: any) {
@@ -80,10 +91,13 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
       try {
         const document = await librarian.getDocument(args);
         
+        // Format the document
+        const formattedText = formatDocument(document);
+          
         return {
-          content: [{ 
-            type: "text", 
-            text: JSON.stringify(document, null, 2)
+          content: [{
+            type: "text",
+            text: formattedText
           }]
         };
       } catch (error: any) {
@@ -107,10 +121,13 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
       try {
         const tags = await librarian.listTags(args);
         
+        // Format the tag list
+        const formattedText = formatTagList(tags);
+          
         return {
           content: [{
             type: "text",
-            text: JSON.stringify(tags, null, 2)
+            text: formattedText
           }]
         };
       } catch (error: any) {

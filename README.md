@@ -30,6 +30,7 @@ The Librarian MCP server is organized into modular components:
 - **src/lib/config.ts**: Type definitions and loader for configuration
 - **src/lib/load.ts**: Document loading and processing functionality
 - **src/lib/librarian.ts**: Core librarian implementation with schemas
+- **src/lib/util.ts**: Formatting utilities for plaintext responses
 - **src/lib/server.ts**: MCP server implementation
 - **src/bin.ts**: CLI entry point
 - **src/index.ts**: Library entry point
@@ -141,19 +142,24 @@ Lists all documents with optional filtering by directory and tags.
 
 **Response:**
 
-```typescript
+```
 // When includeContents is false
-{
-  filepath: string;  // Relative path to the document
-  tags: string[];    // Array of tags (including inherited tags)
-}[]
+- /path/to/document1.md
+  - tags: tag1, tag2, tag3
+- /path/to/document2.md
+  - tags: tag1, tag4, tag5
+...
 
 // When includeContents is true
-{
-  filepath: string;  // Relative path to the document
-  tags: string[];    // Array of tags (including inherited tags)
-  contents: string;  // Document contents
-}[]
+**/path/to/document1.md**
+======
+Document 1 content with frontmatter
+======
+
+**/path/to/document2.md**
+======
+Document 2 content with frontmatter
+======
 ```
 
 ### searchDocuments
@@ -171,19 +177,24 @@ Searches document content using string or regex patterns.
 
 **Response:**
 
-```typescript
+```
 // When includeContents is false
-{
-  filepath: string;  // Relative path to the document
-  tags: string[];    // Array of tags (including inherited tags)
-}[]
+- /path/to/document1.md
+  - tags: tag1, tag2, tag3
+- /path/to/document2.md
+  - tags: tag1, tag4, tag5
+...
 
 // When includeContents is true
-{
-  filepath: string;  // Relative path to the document
-  tags: string[];    // Array of tags (including inherited tags)
-  contents: string;  // Document contents
-}[]
+**/path/to/document1.md**
+======
+Document 1 content with frontmatter
+======
+
+**/path/to/document2.md**
+======
+Document 2 content with frontmatter
+======
 ```
 
 ### getDocument
@@ -196,12 +207,11 @@ Retrieves a specific document by path.
 
 **Response:**
 
-```typescript
-{
-  filepath: string;    // Relative path to the document
-  tags: string[];      // Array of tags (including inherited tags)
-  contents: string;    // Document contents
-}
+```
+**/path/to/document.md**
+======
+Document content with frontmatter
+======
 ```
 
 ### listTags
@@ -215,19 +225,23 @@ Lists all tags with counts and optional filepaths.
 
 **Response:**
 
-```typescript
+```
 // When includeFilepaths is false
-{
-  tag: string;      // The tag name
-  count: number;    // Number of documents with this tag
-}[]
+- tag1 (5)
+- tag2 (3)
+- tag3 (2)
+...
 
 // When includeFilepaths is true
-{
-  tag: string;      // The tag name
-  count: number;    // Number of documents with this tag
-  filepaths: string[];  // Array of filepaths for documents with this tag
-}[]
+- tag1 (5)
+  - files:
+    - /path/to/document1.md
+    - /path/to/document2.md
+    - ...
+- tag2 (3)
+  - files:
+    - /path/to/document3.md
+    - ...
 ```
 
 ## Usage Examples
