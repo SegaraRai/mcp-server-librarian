@@ -217,7 +217,7 @@ describe("createLibrarianServer", () => {
 
     it("getDocuments callback should return formatted documents", async () => {
       const result = await getDocumentsCallback({
-        filepaths: ["/doc1.md", "/doc2.md"]
+        filepaths: ["/doc1.md", "/doc2.md"],
       });
 
       expect(result).toEqual({

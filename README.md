@@ -357,10 +357,7 @@ const document = await mcp.useTool("librarian", "getDocument", {
 ```javascript
 // Get multiple specific documents
 const documents = await mcp.useTool("librarian", "getDocuments", {
-  filepaths: [
-    "/daisyui/components/button.md",
-    "/daisyui/components/card.md"
-  ],
+  filepaths: ["/daisyui/components/button.md", "/daisyui/components/card.md"],
 });
 ```
 

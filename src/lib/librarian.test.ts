@@ -233,7 +233,7 @@ describe("Librarian", () => {
   describe("getDocuments", () => {
     it("should call loadAllDocuments and getDocument for each filepath", async () => {
       const result = await librarian.getDocuments({
-        filepaths: ["/doc1.md", "/doc2.md"]
+        filepaths: ["/doc1.md", "/doc2.md"],
       });
 
       // Verify loadAllDocuments was called
@@ -241,7 +241,7 @@ describe("Librarian", () => {
 
       // Verify getDocument was called for each filepath
       expect(loadModule.getDocument).toHaveBeenCalledTimes(4);
-      
+
       // Verify the result
       expect(result).toHaveLength(2);
       expect(result[0]).toHaveProperty("filepath", "/doc1.md");
@@ -265,7 +265,7 @@ describe("Librarian", () => {
         });
 
       const result = await librarian.getDocuments({
-        filepaths: ["/doc1.md", "/non-existent.md"]
+        filepaths: ["/doc1.md", "/non-existent.md"],
       });
 
       // Verify only the existing document is returned

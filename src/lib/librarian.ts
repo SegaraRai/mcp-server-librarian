@@ -89,7 +89,9 @@ export type GetDocumentParams = z.input<typeof getDocumentSchema>;
  * Input schema for getDocuments
  */
 export const getDocumentsSchema = z.object({
-  filepaths: z.array(z.string()).describe("The file paths of the documents to retrieve"),
+  filepaths: z
+    .array(z.string())
+    .describe("The file paths of the documents to retrieve"),
 });
 
 /**
@@ -218,14 +220,16 @@ export class Librarian {
     const { filepaths } = params;
     const cache = await this.ensureDocumentsLoaded();
 
-    const documents = filepaths.map(filepath => {
-      try {
-        return getDoc(cache, filepath);
-      } catch (error) {
-        console.error(`Error retrieving document ${filepath}:`, error);
-        return null;
-      }
-    }).filter((doc): doc is Document => doc !== null);
+    const documents = filepaths
+      .map((filepath) => {
+        try {
+          return getDoc(cache, filepath);
+        } catch (error) {
+          console.error(`Error retrieving document ${filepath}:`, error);
+          return null;
+        }
+      })
+      .filter((doc): doc is Document => doc !== null);
 
     return documents;
   }
