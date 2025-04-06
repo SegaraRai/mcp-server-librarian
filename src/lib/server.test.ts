@@ -8,25 +8,25 @@ vi.mock("./librarian.js", () => {
   return {
     Librarian: vi.fn().mockImplementation(() => ({
       listDocuments: vi.fn().mockResolvedValue([
-        { filepath: "doc1.md", tags: ["tag1", "tag2"] },
-        { filepath: "doc2.md", tags: ["tag2", "tag3"] },
+        { filepath: "/doc1.md", tags: ["tag1", "tag2"] },
+        { filepath: "/doc2.md", tags: ["tag2", "tag3"] },
       ]),
       searchDocuments: vi
         .fn()
-        .mockResolvedValue([{ filepath: "doc1.md", tags: ["tag1", "tag2"] }]),
+        .mockResolvedValue([{ filepath: "/doc1.md", tags: ["tag1", "tag2"] }]),
       getDocument: vi.fn().mockResolvedValue({
-        filepath: "doc1.md",
+        filepath: "/doc1.md",
         tags: ["tag1", "tag2"],
         contents: "Content of doc1",
       }),
       getDocuments: vi.fn().mockResolvedValue([
         {
-          filepath: "doc1.md",
+          filepath: "/doc1.md",
           tags: ["tag1", "tag2"],
           contents: "Content of doc1",
         },
         {
-          filepath: "doc2.md",
+          filepath: "/doc2.md",
           tags: ["tag2", "tag3"],
           contents: "Content of doc2",
         },
@@ -203,7 +203,7 @@ describe("createLibrarianServer", () => {
     });
 
     it("getDocument callback should return a formatted document", async () => {
-      const result = await getDocumentCallback({ filepath: "doc1.md" });
+      const result = await getDocumentCallback({ filepath: "/doc1.md" });
 
       expect(result).toEqual({
         content: [
@@ -217,7 +217,7 @@ describe("createLibrarianServer", () => {
 
     it("getDocuments callback should return formatted documents", async () => {
       const result = await getDocumentsCallback({
-        filepaths: ["doc1.md", "doc2.md"]
+        filepaths: ["/doc1.md", "/doc2.md"]
       });
 
       expect(result).toEqual({

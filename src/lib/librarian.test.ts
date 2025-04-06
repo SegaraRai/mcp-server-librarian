@@ -7,12 +7,12 @@ import { Document, DocumentCache } from "./load.js";
 vi.mock("./load.js", () => {
   const mockDocuments: Document[] = [
     {
-      filepath: "doc1.md",
+      filepath: "/doc1.md",
       tags: ["tag1", "tag2"],
       contents: "Content of doc1",
     },
     {
-      filepath: "doc2.md",
+      filepath: "/doc2.md",
       tags: ["tag2", "tag3"],
       contents: "Content of doc2",
     },
@@ -121,8 +121,8 @@ describe("Librarian", () => {
 
       // Verify the result
       expect(result).toHaveLength(2);
-      expect(result[0]).toHaveProperty("filepath", "doc1.md");
-      expect(result[1]).toHaveProperty("filepath", "doc2.md");
+      expect(result[0]).toHaveProperty("filepath", "/doc1.md");
+      expect(result[1]).toHaveProperty("filepath", "/doc2.md");
 
       // Verify contents are not included
       expect(result[0]).not.toHaveProperty("contents");
@@ -139,7 +139,7 @@ describe("Librarian", () => {
 
       // Verify the result only includes documents with tag1
       expect(result).toHaveLength(1);
-      expect(result[0]).toHaveProperty("filepath", "doc1.md");
+      expect(result[0]).toHaveProperty("filepath", "/doc1.md");
     });
 
     it("should respect the depth parameter", async () => {
@@ -185,7 +185,7 @@ describe("Librarian", () => {
 
       // Verify the result
       expect(result).toHaveLength(1);
-      expect(result[0]).toHaveProperty("filepath", "doc1.md");
+      expect(result[0]).toHaveProperty("filepath", "/doc1.md");
 
       // Verify contents are not included
       expect(result[0]).not.toHaveProperty("contents");
@@ -205,7 +205,7 @@ describe("Librarian", () => {
 
   describe("getDocument", () => {
     it("should call loadAllDocuments and getDocument", async () => {
-      const result = await librarian.getDocument({ filepath: "doc1.md" });
+      const result = await librarian.getDocument({ filepath: "/doc1.md" });
 
       // Verify loadAllDocuments was called
       expect(loadModule.loadAllDocuments).toHaveBeenCalledWith("/test/docs");
@@ -214,7 +214,7 @@ describe("Librarian", () => {
       expect(loadModule.getDocument).toHaveBeenCalled();
 
       // Verify the result
-      expect(result).toHaveProperty("filepath", "doc1.md");
+      expect(result).toHaveProperty("filepath", "/doc1.md");
       expect(result).toHaveProperty("contents", "Content of doc1");
     });
 
@@ -225,7 +225,7 @@ describe("Librarian", () => {
       });
 
       await expect(
-        librarian.getDocument({ filepath: "non-existent.md" }),
+        librarian.getDocument({ filepath: "/non-existent.md" }),
       ).rejects.toThrow("Document not found");
     });
   });
@@ -233,7 +233,7 @@ describe("Librarian", () => {
   describe("getDocuments", () => {
     it("should call loadAllDocuments and getDocument for each filepath", async () => {
       const result = await librarian.getDocuments({
-        filepaths: ["doc1.md", "doc2.md"]
+        filepaths: ["/doc1.md", "/doc2.md"]
       });
 
       // Verify loadAllDocuments was called
@@ -244,9 +244,9 @@ describe("Librarian", () => {
       
       // Verify the result
       expect(result).toHaveLength(2);
-      expect(result[0]).toHaveProperty("filepath", "doc1.md");
+      expect(result[0]).toHaveProperty("filepath", "/doc1.md");
       expect(result[0]).toHaveProperty("contents", "Content of doc1");
-      expect(result[1]).toHaveProperty("filepath", "doc2.md");
+      expect(result[1]).toHaveProperty("filepath", "/doc2.md");
       expect(result[1]).toHaveProperty("contents", "Content of doc2");
     });
 
@@ -255,22 +255,22 @@ describe("Librarian", () => {
       vi.mocked(loadModule.getDocument)
         .mockImplementationOnce((cache, filepath) => {
           return {
-            filepath: "doc1.md",
+            filepath: "/doc1.md",
             tags: ["tag1", "tag2"],
             contents: "Content of doc1",
           };
         })
         .mockImplementationOnce((cache, filepath) => {
-          throw new Error("Document not found: non-existent.md");
+          throw new Error("Document not found: /non-existent.md");
         });
 
       const result = await librarian.getDocuments({
-        filepaths: ["doc1.md", "non-existent.md"]
+        filepaths: ["/doc1.md", "/non-existent.md"]
       });
 
       // Verify only the existing document is returned
       expect(result).toHaveLength(1);
-      expect(result[0]).toHaveProperty("filepath", "doc1.md");
+      expect(result[0]).toHaveProperty("filepath", "/doc1.md");
     });
   });
 
