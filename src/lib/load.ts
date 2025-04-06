@@ -5,6 +5,7 @@ import fg from "fast-glob";
 import matter from "gray-matter";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { normalizePath, removeLeadingSlash } from "./normalize.js";
 
 /**
  * Document interface representing a markdown document
@@ -72,9 +73,11 @@ function readMarkdownFile(docsRoot: string, filepath: string): RawDocument {
 
   const fileContent = fs.readFileSync(fullPath, "utf-8");
   const { data, content } = matter(fileContent);
+  // Ensure filepath has a leading "/"
+  const normalizedFilepath = normalizePath(filepath);
 
   return {
-    filepath,
+    filepath: normalizedFilepath,
     tags: Array.isArray(data.tags) ? data.tags : [],
     contents: content,
   };
@@ -88,14 +91,16 @@ function getInheritedTags(
   filepath: string,
   documentMap: Map<string, RawDocument>,
 ): string[] {
-  const parts = filepath.split("/").filter(Boolean);
+  // Remove the leading "/" if present
+  const normalizedPath = removeLeadingSlash(filepath);
+  const parts = normalizedPath.split("/").filter(Boolean);
   const allTags: string[] = [];
 
   // Start from root and traverse down the path
   let currentPath = "";
 
   // Check root index.md
-  const rootIndexPath = "index.md";
+  const rootIndexPath = "/index.md";
   const rootIndexDoc = documentMap.get(rootIndexPath);
   if (rootIndexDoc) {
     allTags.push(...rootIndexDoc.tags);
@@ -105,7 +110,7 @@ function getInheritedTags(
   for (let i = 0; i < parts.length - 1; i++) {
     currentPath = currentPath ? `${currentPath}/${parts[i]}` : parts[i];
 
-    const indexPath = `${currentPath}/index.md`;
+    const indexPath = `/${currentPath}/index.md`;
     const indexDoc = documentMap.get(indexPath);
     if (indexDoc) {
       allTags.push(...indexDoc.tags);
@@ -151,7 +156,9 @@ export async function loadAllDocuments(
     try {
       const doc = readMarkdownFile(docsRoot, file);
       rawDocuments.push(doc);
-      rawDocumentMap.set(file, doc);
+      // Use the normalized filepath (with leading "/") as the key
+      const normalizedFile = normalizePath(file);
+      rawDocumentMap.set(normalizedFile, doc);
     } catch (error) {
       console.error(`Error processing file ${file}:`, error);
     }
@@ -204,9 +211,8 @@ export function filterDocuments(
   tags: string[] = [],
   depth: number = -1,
 ): Document[] {
-  const normalizedDir = directory.startsWith("/")
-    ? directory.substring(1)
-    : directory;
+  // Remove the leading "/" for directory comparison
+  const normalizedDir = removeLeadingSlash(directory);
   const dirPrefix = normalizedDir === "" ? "" : `${normalizedDir}/`;
 
   // Filter by directory
@@ -217,7 +223,9 @@ export function filterDocuments(
     }
     
     // Check if document is in the specified directory
-    if (!doc.filepath.startsWith(dirPrefix)) {
+    // Remove the leading "/" from the filepath for comparison
+    const normalizedFilepath = removeLeadingSlash(doc.filepath);
+    if (!normalizedFilepath.startsWith(dirPrefix)) {
       return false;
     }
     
@@ -227,7 +235,7 @@ export function filterDocuments(
     }
     
     // Calculate the relative path from the specified directory
-    const relativePath = doc.filepath.substring(dirPrefix.length);
+    const relativePath = normalizedFilepath.substring(dirPrefix.length);
     
     // If relativePath is empty, it's the directory itself or an index file
     if (relativePath === "" || relativePath === "index.md") {
@@ -309,9 +317,8 @@ export function searchDocuments(
  * Get a document by filepath
  */
 export function getDocument(cache: DocumentCache, filepath: string): Document {
-  const normalizedPath = filepath.startsWith("/")
-    ? filepath.substring(1)
-    : filepath;
+  // Ensure filepath has a leading "/"
+  const normalizedPath = normalizePath(filepath);
 
   const doc = cache.documentMap.get(normalizedPath);
   if (!doc) {

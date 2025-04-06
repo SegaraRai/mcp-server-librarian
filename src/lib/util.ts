@@ -2,6 +2,7 @@
  * Utility functions for formatting responses
  */
 import { Document } from "./load.js";
+import { normalizePath } from "./normalize.js";
 
 /**
  * Format a list of tags as plaintext
@@ -11,7 +12,7 @@ export function formatTags(tags: readonly string[]): string {
     return "(no tags)";
   }
 
-  return tags.map((tag) => `- ${tag}`).join("\n");
+  return tags.join(", ");
 }
 
 /**
@@ -24,9 +25,7 @@ export function formatDocumentList(documents: Document[]): string {
 
   return documents
     .map((doc) => {
-      const filepath = doc.filepath.startsWith("/")
-        ? doc.filepath
-        : `/${doc.filepath}`;
+      const filepath = normalizePath(doc.filepath);
       return `- ${filepath}\n  - tags: ${formatTags(doc.tags)}`;
     })
     .join("\n");
@@ -47,10 +46,8 @@ export function formatDocumentListWithContents(documents: Document[]): string {
  * Format a single document as plaintext
  */
 export function formatDocument(document: Document): string {
-  const filepath = document.filepath.startsWith("/")
-    ? document.filepath
-    : `/${document.filepath}`;
-  return `**${filepath}**\ntags: ${formatTags(document.tags)}\n======\n${document.contents ?? ""}\n======`;
+  const filepath = normalizePath(document.filepath);
+  return `**${filepath}**\n- tags: ${formatTags(document.tags)}\n======\n${document.contents ?? ""}\n======`;
 }
 
 /**
@@ -69,7 +66,7 @@ export function formatTagList(
 
       if (tagInfo.filepaths && tagInfo.filepaths.length > 0) {
         const files = tagInfo.filepaths
-          .map((file) => `  - ${file.startsWith("/") ? file : `/${file}`}`)
+          .map((file) => `  - ${normalizePath(file)}`)
           .join("\n");
         result += `\n${files}`;
       }
