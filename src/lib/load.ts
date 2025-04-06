@@ -5,7 +5,7 @@ import fg from "fast-glob";
 import matter from "gray-matter";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { normalizePath, removeLeadingSlash } from "./normalize.js";
+import { normalizePath } from "./normalize.js";
 
 /**
  * Document interface representing a markdown document
@@ -91,9 +91,7 @@ function getInheritedTags(
   filepath: string,
   documentMap: Map<string, RawDocument>,
 ): string[] {
-  // Remove the leading "/" if present
-  const normalizedPath = removeLeadingSlash(filepath);
-  const parts = normalizedPath.split("/").filter(Boolean);
+  const parts = normalizePath(filepath).slice(1).split("/").filter(Boolean);
   const allTags: string[] = [];
 
   // Start from root and traverse down the path
