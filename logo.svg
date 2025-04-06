@@ -1,0 +1,32 @@
+<svg width="300" height="200" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Book stack - moved to be more centered in the wider view -->
+  <g transform="translate(100, 60)">
+    <!-- Book 1 (bottom) -->
+    <rect x="0" y="50" width="100" height="20" rx="2" ry="2" fill="#3182ce" stroke="#2c5282" stroke-width="1"/>
+    <rect x="0" y="50" width="10" height="20" rx="0" ry="0" fill="#2c5282"/>
+    
+    <!-- Book 2 (middle) -->
+    <rect x="5" y="30" width="100" height="20" rx="2" ry="2" fill="#38a169" stroke="#276749" stroke-width="1"/>
+    <rect x="5" y="30" width="10" height="20" rx="0" ry="0" fill="#276749"/>
+    
+    <!-- Book 3 (top) -->
+    <rect x="10" y="10" width="100" height="20" rx="2" ry="2" fill="#e53e3e" stroke="#9b2c2c" stroke-width="1"/>
+    <rect x="10" y="10" width="10" height="20" rx="0" ry="0" fill="#9b2c2c"/>
+    
+    <!-- Digital elements: circuit-like lines -->
+    <path d="M 80 10 L 100 10 L 100 0" fill="none" stroke="#4a5568" stroke-width="1.5"/>
+    <path d="M 75 30 L 95 30 L 95 5" fill="none" stroke="#4a5568" stroke-width="1.5"/>
+    <path d="M 70 50 L 90 50 L 90 15" fill="none" stroke="#4a5568" stroke-width="1.5"/>
+    
+    <!-- Small circles at the end of circuit lines -->
+    <circle cx="100" cy="0" r="3" fill="#4a5568"/>
+    <circle cx="95" cy="5" r="3" fill="#4a5568"/>
+    <circle cx="90" cy="15" r="3" fill="#4a5568"/>
+  </g>
+  
+  <!-- Text: Librarian - centered in the wider view -->
+  <text x="150" y="150" font-family="Arial, sans-serif" font-size="22" font-weight="bold" text-anchor="middle" fill="#2d3748">Librarian</text>
+  
+  <!-- Tagline - now has more space -->
+  <text x="150" y="170" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#4a5568">Knowledge at your fingertips</text>
+</svg>
