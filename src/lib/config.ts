@@ -1,7 +1,7 @@
 /**
  * Configuration module for the Librarian MCP server
  */
-import * as fs from "fs";
+import * as fs from "node:fs";
 
 /**
  * Configuration options for the Librarian

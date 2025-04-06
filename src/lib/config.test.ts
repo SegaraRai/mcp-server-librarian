@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import * as fs from "node:fs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ensureDocsRoot, getConfig, LibrarianConfig } from "./config.js";
 
@@ -9,7 +9,7 @@ vi.mock("process", () => ({
 }));
 
 // Mock fs functions
-vi.mock("fs", () => ({
+vi.mock("node:fs", () => ({
   existsSync: vi.fn(),
   mkdirSync: vi.fn(),
 }));

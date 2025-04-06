@@ -2,9 +2,9 @@
  * Document loading module for the Librarian MCP server
  */
 import fg from "fast-glob";
-import * as fs from "fs";
 import matter from "gray-matter";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 
 /**
  * Document interface representing a markdown document
