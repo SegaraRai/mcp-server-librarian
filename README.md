@@ -20,7 +20,21 @@ Librarian does not provide any writing operations - it is a read-only service de
   - Simple string searches (case insensitive)
   - Regular expression searches with customizable flags
 - **Efficient Document Retrieval**: Quickly access specific documents by path
+- **Tag Discovery**: List all available tags with usage counts and optional file paths
 - **MCP Integration**: Seamlessly integrates with the Model Context Protocol
+
+## Project Structure
+
+The Librarian MCP server is organized into modular components:
+
+- **src/lib/config.ts**: Type definitions and loader for configuration
+- **src/lib/load.ts**: Document loading and processing functionality
+- **src/lib/librarian.ts**: Core librarian implementation with schemas
+- **src/lib/server.ts**: MCP server implementation
+- **src/bin.ts**: CLI entry point
+- **src/index.ts**: Library entry point
+
+This modular design allows for easy extension and maintenance, with clear separation of concerns.
 
 ## Installation
 
@@ -50,13 +64,13 @@ The document folder path can be configured using the following methods (in order
 ### Command-line Arguments
 
 ```bash
-node dist/index.js --docs-root /path/to/your/docs
+node dist/bin.js --docs-root /path/to/your/docs
 ```
 
 ### Environment Variables
 
 ```bash
-LIBRARIAN_DOCS_ROOT=/path/to/your/docs node dist/index.js
+LIBRARIAN_DOCS_ROOT=/path/to/your/docs node dist/bin.js
 ```
 
 ## Document Structure
@@ -190,19 +204,45 @@ Retrieves a specific document by path.
 }
 ```
 
+### listTags
+
+Lists all tags with counts and optional filepaths.
+
+**Parameters:**
+
+- `directory` (optional): The directory path to list tags from (default: "/")
+- `includeFilepaths` (optional): Whether to include filepaths in results (default: false)
+
+**Response:**
+
+```typescript
+// When includeFilepaths is false
+{
+  tag: string;      // The tag name
+  count: number;    // Number of documents with this tag
+}[]
+
+// When includeFilepaths is true
+{
+  tag: string;      // The tag name
+  count: number;    // Number of documents with this tag
+  filepaths: string[];  // Array of filepaths for documents with this tag
+}[]
+```
+
 ## Usage Examples
 
 ### Starting the Server
 
 ```bash
 # Start with default configuration
-node dist/index.js
+node dist/bin.js
 
 # Start with custom docs directory
-node dist/index.js --docs-root ./my-documentation
+node dist/bin.js --docs-root ./my-documentation
 
 # Start with environment variable
-LIBRARIAN_DOCS_ROOT=./my-documentation node dist/index.js
+LIBRARIAN_DOCS_ROOT=./my-documentation node dist/bin.js
 ```
 
 ### Example Queries
@@ -257,14 +297,32 @@ const document = await mcp.useTool("librarian", "getDocument", {
 });
 ```
 
+#### Listing Tags
+
+```javascript
+// List all tags
+const allTags = await mcp.useTool("librarian", "listTags", {});
+
+// List tags in a specific directory
+const tailwindTags = await mcp.useTool("librarian", "listTags", {
+  directory: "/tailwind",
+});
+
+// List tags with filepaths
+const tagsWithFiles = await mcp.useTool("librarian", "listTags", {
+  includeFilepaths: true,
+});
+```
+
 ## Integration with LLMs
 
 Librarian is designed to work seamlessly with LLMs through the Model Context Protocol. Here's how an LLM might use Librarian:
 
-1. **Discovery**: The LLM can list available documents to understand what knowledge is available
-2. **Search**: When the LLM needs specific information, it can search across documents
-3. **Retrieval**: Once the LLM identifies a relevant document, it can retrieve its full content
-4. **Context Building**: The LLM can use the retrieved content to build context for generating responses
+1. **Tag Discovery**: The LLM can list available tags to understand the knowledge taxonomy
+2. **Document Discovery**: The LLM can list available documents to understand what knowledge is available
+3. **Search**: When the LLM needs specific information, it can search across documents
+4. **Retrieval**: Once the LLM identifies a relevant document, it can retrieve its full content
+5. **Context Building**: The LLM can use the retrieved content to build context for generating responses
 
 ## Error Handling
 
