@@ -240,7 +240,7 @@ export function searchDocuments(
 
   // Create regex flags based on parameters
   const flags = caseSensitive ? "g" : "gi";
-  
+
   // Create regex pattern based on mode
   let pattern: RegExp;
   if (mode === "string") {
@@ -260,7 +260,7 @@ export function searchDocuments(
 
   // Search in document contents
   const results = filtered.filter(
-    (doc) => doc.contents && pattern.test(doc.contents)
+    (doc) => doc.contents && pattern.test(doc.contents),
   );
 
   // Remove contents if not requested
@@ -305,7 +305,7 @@ export function getTagsInDirectory(
   for (const doc of documents) {
     for (const tag of doc.tags) {
       // Increment tag count
-      tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+      tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
 
       // Add filepath to tag if needed
       if (includeFilepaths) {
@@ -326,7 +326,7 @@ export function getTagsInDirectory(
       };
 
       if (includeFilepaths) {
-        result.filepaths = Array.from(tagFilepaths.get(tag) || []);
+        result.filepaths = Array.from(tagFilepaths.get(tag) ?? []);
       }
 
       return result;

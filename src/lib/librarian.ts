@@ -17,32 +17,53 @@ import {
  * Input schema for listDocuments
  */
 export const listDocumentsSchema = z.object({
-  directory: z.string().default("/").describe("The directory path to list documents from"),
+  directory: z
+    .string()
+    .default("/")
+    .describe("The directory path to list documents from"),
   tags: z.array(z.string()).default([]).describe("Tags to filter documents by"),
-  includeContents: z.boolean().optional().default(false).describe("Whether to include document contents in results"),
+  includeContents: z
+    .boolean()
+    .default(false)
+    .describe("Whether to include document contents in results"),
 });
 
 /**
  * Type for listDocuments parameters
  */
-export type ListDocumentsParams = z.infer<typeof listDocumentsSchema>;
+export type ListDocumentsParams = z.input<typeof listDocumentsSchema>;
 
 /**
  * Input schema for searchDocuments
  */
 export const searchDocumentsSchema = z.object({
   query: z.string().describe("The search query string"),
-  mode: z.enum(["string", "regex"]).optional().default("string").describe("Search mode (string or regex)"),
-  caseSensitive: z.boolean().optional().default(false).describe("Whether the search should be case-sensitive"),
-  directory: z.string().default("/").describe("The directory path to search documents in"),
-  tags: z.array(z.string()).default([]).describe("Tags to filter search results by"),
-  includeContents: z.boolean().optional().default(false).describe("Whether to include document contents in results"),
+  mode: z
+    .enum(["string", "regex"])
+    .default("string")
+    .describe("Search mode (string or regex)"),
+  caseSensitive: z
+    .boolean()
+    .default(false)
+    .describe("Whether the search should be case-sensitive"),
+  directory: z
+    .string()
+    .default("/")
+    .describe("The directory path to search documents in"),
+  tags: z
+    .array(z.string())
+    .default([])
+    .describe("Tags to filter search results by"),
+  includeContents: z
+    .boolean()
+    .default(false)
+    .describe("Whether to include document contents in results"),
 });
 
 /**
  * Type for searchDocuments parameters
  */
-export type SearchDocumentsParams = z.infer<typeof searchDocumentsSchema>;
+export type SearchDocumentsParams = z.input<typeof searchDocumentsSchema>;
 
 /**
  * Input schema for getDocument
@@ -54,26 +75,32 @@ export const getDocumentSchema = z.object({
 /**
  * Type for getDocument parameters
  */
-export type GetDocumentParams = z.infer<typeof getDocumentSchema>;
+export type GetDocumentParams = z.input<typeof getDocumentSchema>;
 
 /**
  * Input schema for listTags
  */
 export const listTagsSchema = z.object({
-  directory: z.string().default("/").describe("The directory path to list tags from"),
-  includeFilepaths: z.boolean().default(false).describe("Whether to include file paths for each tag"),
+  directory: z
+    .string()
+    .default("/")
+    .describe("The directory path to list tags from"),
+  includeFilepaths: z
+    .boolean()
+    .default(false)
+    .describe("Whether to include file paths for each tag"),
 });
 
 /**
  * Type for listTags parameters
  */
-export type ListTagsParams = z.infer<typeof listTagsSchema>;
+export type ListTagsParams = z.input<typeof listTagsSchema>;
 
 /**
  * Librarian class for managing and retrieving markdown documents
  */
 export class Librarian {
-  private config: LibrarianConfig;
+  private readonly config: LibrarianConfig;
   private documentCache: DocumentCache | null = null;
   private loading: Promise<DocumentCache> | null = null;
 
@@ -119,7 +146,7 @@ export class Librarian {
     if (!includeContents) {
       return documents.map(({ contents, ...rest }) => rest);
     }
-    
+
     return documents;
   }
 
@@ -127,7 +154,8 @@ export class Librarian {
    * Search documents using string or regex patterns
    */
   async searchDocuments(params: SearchDocumentsParams): Promise<Document[]> {
-    const { query, mode, caseSensitive, directory, tags, includeContents } = params;
+    const { query, mode, caseSensitive, directory, tags, includeContents } =
+      params;
     const cache = await this.ensureDocumentsLoaded();
 
     return searchDocs(
@@ -137,7 +165,7 @@ export class Librarian {
       tags,
       includeContents,
       mode,
-      caseSensitive
+      caseSensitive,
     );
   }
 

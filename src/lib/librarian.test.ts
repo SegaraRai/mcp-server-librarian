@@ -137,9 +137,6 @@ describe("Librarian", () => {
       const result = await librarian.searchDocuments({
         query: "doc1",
         mode: "string",
-        caseSensitive: false,
-        directory: "/",
-        tags: [],
         includeContents: false,
       });
 
@@ -160,10 +157,7 @@ describe("Librarian", () => {
     it("should include contents when requested", async () => {
       const result = await librarian.searchDocuments({
         query: "doc1",
-        mode: "string",
-        caseSensitive: false,
         directory: "/",
-        tags: [],
         includeContents: true,
       });
 
@@ -244,7 +238,9 @@ describe("Librarian", () => {
       const loadSpy = vi.spyOn(loadModule, "loadAllDocuments");
 
       // Call a method to load the cache
-      await testLibrarian.listDocuments({ directory: "/", tags: [], includeContents: false });
+      await testLibrarian.listDocuments({
+        directory: "/",
+      });
 
       // Verify loadAllDocuments was called
       expect(loadSpy).toHaveBeenCalledTimes(1);
@@ -269,7 +265,9 @@ describe("Librarian", () => {
       await testLibrarian.reloadDocuments();
 
       // Call a method again
-      await testLibrarian.listDocuments({ directory: "/", tags: [], includeContents: false });
+      await testLibrarian.listDocuments({
+        directory: "/",
+      });
 
       // Verify loadAllDocuments was called again
       expect(loadSpy).toHaveBeenCalledTimes(1);

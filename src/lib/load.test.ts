@@ -112,6 +112,7 @@ describe("searchDocuments", () => {
       "/",
       [],
       true,
+      "regex",
     );
 
     // Verify we got a result
