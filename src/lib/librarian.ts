@@ -3,10 +3,11 @@
  */
 import { z } from 'zod';
 import { LibrarianConfig } from './config.js';
-import { 
-  Document, 
-  DocumentCache, 
-  loadAllDocuments, 
+import {
+  Document,
+  DocumentCache,
+  loadAllDocuments,
+  getTagsInDirectory,
   filterDocuments, 
   searchDocuments as searchDocs, 
   getDocument as getDoc 
@@ -51,6 +52,19 @@ export const getDocumentSchema = z.object({
  * Type for getDocument parameters
  */
 export type GetDocumentParams = z.infer<typeof getDocumentSchema>;
+
+/**
+ * Input schema for listTags
+ */
+export const listTagsSchema = z.object({
+  directory: z.string().default("/"),
+  includeFilepaths: z.boolean().default(false)
+});
+
+/**
+ * Type for listTags parameters
+ */
+export type ListTagsParams = z.infer<typeof listTagsSchema>;
 
 /**
  * Librarian class for managing and retrieving markdown documents
@@ -120,5 +134,15 @@ export class Librarian {
     const cache = await this.ensureDocumentsLoaded();
     
     return getDoc(cache, filepath);
+  }
+
+  /**
+   * List all tags with counts and optional filepaths
+   */
+  async listTags(params: ListTagsParams): Promise<{ tag: string; count: number; filepaths?: string[] }[]> {
+    const { directory, includeFilepaths } = params;
+    const cache = await this.ensureDocumentsLoaded();
+    
+    return getTagsInDirectory(cache, directory, includeFilepaths);
   }
 }

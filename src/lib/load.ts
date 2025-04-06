@@ -207,7 +207,7 @@ export function filterDocuments(
   }
   
   return dirFiltered.filter(doc => 
-    tags.some(tag => doc.tags.includes(tag))
+    tags.some((tag: string) => doc.tags.includes(tag))
   );
 }
 
@@ -263,4 +263,49 @@ export function getDocument(
   }
   
   return doc;
+}
+
+/**
+ * Get all tags in a specific directory
+ */
+export function getTagsInDirectory(
+  cache: DocumentCache,
+  directory: string = "/",
+  includeFilepaths: boolean = false
+): { tag: string; count: number; filepaths?: string[] }[] {
+  // Filter documents by directory
+  const documents = filterDocuments(cache, directory, []);
+  
+  // Count tags and collect filepaths
+  const tagCounts = new Map<string, number>();
+  const tagFilepaths = new Map<string, Set<string>>();
+  
+  for (const doc of documents) {
+    for (const tag of doc.tags) {
+      // Increment tag count
+      tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+      
+      // Add filepath to tag if needed
+      if (includeFilepaths) {
+        if (!tagFilepaths.has(tag)) {
+          tagFilepaths.set(tag, new Set());
+        }
+        tagFilepaths.get(tag)!.add(doc.filepath);
+      }
+    }
+  }
+  
+  // Convert to result format
+  return Array.from(tagCounts.entries()).map(([tag, count]) => {
+    const result: { tag: string; count: number; filepaths?: string[] } = {
+      tag,
+      count
+    };
+    
+    if (includeFilepaths) {
+      result.filepaths = Array.from(tagFilepaths.get(tag) || []);
+    }
+    
+    return result;
+  }).sort((a, b) => b.count - a.count); // Sort by count descending
 }

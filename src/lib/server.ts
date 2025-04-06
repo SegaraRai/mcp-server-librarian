@@ -2,7 +2,7 @@
  * MCP server implementation for Librarian
  */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { Librarian, listDocumentsSchema, searchDocumentsSchema, getDocumentSchema } from './librarian.js';
+import { Librarian, listDocumentsSchema, searchDocumentsSchema, getDocumentSchema, listTagsSchema } from './librarian.js';
 import { LibrarianConfig } from './config.js';
 
 /**
@@ -92,6 +92,33 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
           content: [{ 
             type: "text", 
             text: `Failed to get document: ${error.message || "Unknown error"}`
+          }],
+          isError: true
+        };
+      }
+    }
+  );
+
+  // Add listTags tool
+  server.tool(
+    "listTags",
+    listTagsSchema.shape,
+    async (args, extra) => {
+      try {
+        const tags = await librarian.listTags(args);
+        
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify(tags, null, 2)
+          }]
+        };
+      } catch (error: any) {
+        console.error("Error in listTags:", error);
+        return {
+          content: [{
+            type: "text",
+            text: `Failed to list tags: ${error.message || "Unknown error"}`
           }],
           isError: true
         };
