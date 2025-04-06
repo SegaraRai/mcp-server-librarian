@@ -45,6 +45,16 @@ describe("filterDocuments", () => {
   function createNestedDocCache(): DocumentCache {
     const documents = [
       {
+        filepath: "/parent/nested/deep/child3.md",
+        tags: ["deep"],
+        contents: "Deep nested child 3",
+      },
+      {
+        filepath: "/parent/nested/child2.md",
+        tags: ["nested"],
+        contents: "Nested child 2",
+      },
+      {
         filepath: "/parent/index.md",
         tags: ["parent"],
         contents: "Parent index",
@@ -53,16 +63,6 @@ describe("filterDocuments", () => {
         filepath: "/parent/child1.md",
         tags: ["child"],
         contents: "Child 1",
-      },
-      {
-        filepath: "/parent/nested/child2.md",
-        tags: ["nested"],
-        contents: "Nested child 2",
-      },
-      {
-        filepath: "/parent/nested/deep/child3.md",
-        tags: ["deep"],
-        contents: "Deep nested child 3",
       },
     ];
 
@@ -112,9 +112,9 @@ describe("filterDocuments", () => {
 
     // Should include parent/index.md and parent/child1.md but not deeper nested files
     expect(results.length).toBe(2);
-    expect(results.map((d) => d.filepath).sort()).toEqual([
-      "/parent/child1.md",
+    expect(results.map((d) => d.filepath)).toEqual([
       "/parent/index.md",
+      "/parent/child1.md",
     ]);
   });
 
@@ -124,10 +124,10 @@ describe("filterDocuments", () => {
 
     // Should include all except the deepest nested file
     expect(results.length).toBe(3);
-    expect(results.map((d) => d.filepath).sort()).toEqual([
-      "/parent/child1.md",
-      "/parent/index.md",
+    expect(results.map((d) => d.filepath)).toEqual([
       "/parent/nested/child2.md",
+      "/parent/index.md",
+      "/parent/child1.md",
     ]);
   });
 
@@ -145,6 +145,16 @@ describe("searchDocuments", () => {
   function createNestedSearchDocCache(): DocumentCache {
     const documents = [
       {
+        filepath: "/parent/nested/deep/child3.md",
+        tags: ["deep"],
+        contents: "Deep nested child 3 with search term",
+      },
+      {
+        filepath: "/parent/nested/child2.md",
+        tags: ["nested"],
+        contents: "Nested child 2 with search term",
+      },
+      {
         filepath: "/parent/index.md",
         tags: ["parent"],
         contents: "Parent index with search term",
@@ -153,16 +163,6 @@ describe("searchDocuments", () => {
         filepath: "/parent/child1.md",
         tags: ["child"],
         contents: "Child 1 with search term",
-      },
-      {
-        filepath: "/parent/nested/child2.md",
-        tags: ["nested"],
-        contents: "Nested child 2 with search term",
-      },
-      {
-        filepath: "/parent/nested/deep/child3.md",
-        tags: ["deep"],
-        contents: "Deep nested child 3 with search term",
       },
     ];
 
@@ -293,9 +293,9 @@ describe("searchDocuments", () => {
       1,
     );
     expect(resultsDepth1.length).toBe(2);
-    expect(resultsDepth1.map((d) => d.filepath).sort()).toEqual([
-      "/parent/child1.md",
+    expect(resultsDepth1.map((d) => d.filepath)).toEqual([
       "/parent/index.md",
+      "/parent/child1.md",
     ]);
 
     // Test with depth=2
@@ -310,10 +310,10 @@ describe("searchDocuments", () => {
       2,
     );
     expect(resultsDepth2.length).toBe(3);
-    expect(resultsDepth2.map((d) => d.filepath).sort()).toEqual([
-      "/parent/child1.md",
-      "/parent/index.md",
+    expect(resultsDepth2.map((d) => d.filepath)).toEqual([
       "/parent/nested/child2.md",
+      "/parent/index.md",
+      "/parent/child1.md",
     ]);
 
     // Test with depth=-1 (all)
@@ -328,11 +328,11 @@ describe("searchDocuments", () => {
       -1,
     );
     expect(resultsAll.length).toBe(4);
-    expect(resultsAll.map((d) => d.filepath).sort()).toEqual([
-      "/parent/child1.md",
-      "/parent/index.md",
-      "/parent/nested/child2.md",
+    expect(resultsAll.map((d) => d.filepath)).toEqual([
       "/parent/nested/deep/child3.md",
+      "/parent/nested/child2.md",
+      "/parent/index.md",
+      "/parent/child1.md",
     ]);
   });
 });
@@ -358,6 +358,16 @@ describe("getTagsInDirectory", () => {
   function createNestedTagDocCache(): DocumentCache {
     const documents = [
       {
+        filepath: "/parent/nested/deep/child3.md",
+        tags: ["deep-tag"],
+        contents: "Deep nested child 3",
+      },
+      {
+        filepath: "/parent/nested/child2.md",
+        tags: ["nested-tag"],
+        contents: "Nested child 2",
+      },
+      {
         filepath: "/parent/index.md",
         tags: ["parent-tag"],
         contents: "Parent index",
@@ -366,16 +376,6 @@ describe("getTagsInDirectory", () => {
         filepath: "/parent/child1.md",
         tags: ["child-tag"],
         contents: "Child 1",
-      },
-      {
-        filepath: "/parent/nested/child2.md",
-        tags: ["nested-tag"],
-        contents: "Nested child 2",
-      },
-      {
-        filepath: "/parent/nested/deep/child3.md",
-        tags: ["deep-tag"],
-        contents: "Deep nested child 3",
       },
     ];
 

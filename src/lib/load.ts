@@ -192,6 +192,40 @@ export async function loadAllDocuments(
     }
   }
 
+  // Sort documents by path components
+  documents.sort((a, b) => {
+    // Split paths into components
+    const pathA = a.filepath.split("/").filter(Boolean);
+    const pathB = b.filepath.split("/").filter(Boolean);
+
+    // Compare each path component
+    for (let i = 0; i < Math.min(pathA.length, pathB.length); i++) {
+      // If we're at the filename level for both paths
+      if (i === pathA.length - 1 && i === pathB.length - 1) {
+        // Both are files in the same directory
+        // index.md comes first
+        if (pathA[i] === "index.md" && pathB[i] !== "index.md") return -1;
+        if (pathA[i] !== "index.md" && pathB[i] === "index.md") return 1;
+
+        // Otherwise sort alphabetically
+        return pathA[i].localeCompare(pathB[i]);
+      }
+
+      // If components differ
+      if (pathA[i] !== pathB[i]) {
+        // Check if one is a file (last component)
+        if (i === pathA.length - 1) return 1; // A is a file, so it comes after B
+        if (i === pathB.length - 1) return -1; // B is a file, so it comes after A
+
+        // Both are directories, sort alphabetically
+        return pathA[i].localeCompare(pathB[i]);
+      }
+    }
+
+    // If one path is shorter, it comes first (directories before files)
+    return pathA.length - pathB.length;
+  });
+
   return {
     documents,
     documentMap,
