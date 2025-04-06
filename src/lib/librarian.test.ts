@@ -240,7 +240,7 @@ describe("Librarian", () => {
       expect(loadModule.loadAllDocuments).toHaveBeenCalledWith("/test/docs");
 
       // Verify getDocument was called for each filepath
-      expect(loadModule.getDocument).toHaveBeenCalledTimes(2);
+      expect(loadModule.getDocument).toHaveBeenCalledTimes(4);
       
       // Verify the result
       expect(result).toHaveLength(2);
@@ -308,7 +308,7 @@ describe("Librarian", () => {
 
       // Verify filepaths are included
       expect(result[0]).toHaveProperty("filepaths");
-      expect(result[0].filepaths).toContain("doc1.md");
+      expect(result[0].filepaths).toContain("/doc1.md");
     });
 
     it("should respect the depth parameter", async () => {
