@@ -1,6 +1,6 @@
 import * as fs from "node:fs";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ensureDocsRoot, getConfig, LibrarianConfig } from "./config.js";
+import { checkDocsRootExists, getConfig, LibrarianConfig } from "./config.js";
 
 // Mock process.argv and process.env
 vi.mock("process", () => ({
@@ -44,19 +44,16 @@ describe("getConfig", () => {
   });
 });
 
-describe("ensureDocsRoot", () => {
+describe("checkDocsRootExists", () => {
   it("should do nothing if the directory exists", () => {
     // Mock fs.existsSync to return true
     vi.mocked(fs.existsSync).mockReturnValue(true);
 
     const config: LibrarianConfig = { docsRoot: "/existing/path" };
-    ensureDocsRoot(config);
+    expect(() => checkDocsRootExists(config)).not.toThrow();
 
     // Verify existsSync was called
     expect(fs.existsSync).toHaveBeenCalledWith("/existing/path");
-
-    // Verify mkdirSync was not called
-    expect(fs.mkdirSync).not.toHaveBeenCalled();
   });
 
   it("should create the directory if it does not exist", () => {
@@ -64,14 +61,9 @@ describe("ensureDocsRoot", () => {
     vi.mocked(fs.existsSync).mockReturnValue(false);
 
     const config: LibrarianConfig = { docsRoot: "/non-existing/path" };
-    ensureDocsRoot(config);
+    expect(() => checkDocsRootExists(config)).toThrow();
 
     // Verify existsSync was called
     expect(fs.existsSync).toHaveBeenCalledWith("/non-existing/path");
-
-    // Verify mkdirSync was called with the correct arguments
-    expect(fs.mkdirSync).toHaveBeenCalledWith("/non-existing/path", {
-      recursive: true,
-    });
   });
 });

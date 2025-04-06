@@ -4,7 +4,7 @@
  * Command-line entry point for the Librarian MCP server
  */
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { ensureDocsRoot, getConfig } from "./lib/config.js";
+import { checkDocsRootExists, getConfig } from "./lib/config.js";
 import { createLibrarianServer } from "./lib/server.js";
 
 /**
@@ -16,8 +16,8 @@ async function start() {
     const config = getConfig();
     console.log(`Using docs root: ${config.docsRoot}`);
 
-    // Ensure docs directory exists
-    ensureDocsRoot(config);
+    // Check if the docs root directory exists
+    checkDocsRootExists(config);
 
     // Create server
     const server = createLibrarianServer(config);

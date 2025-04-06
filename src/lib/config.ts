@@ -41,12 +41,10 @@ export function getConfig(): LibrarianConfig {
 }
 
 /**
- * Ensure the docs root directory exists
+ * Check if the docs root directory exists
  */
-export function ensureDocsRoot(config: LibrarianConfig): void {
+export function checkDocsRootExists(config: LibrarianConfig): void {
   if (!fs.existsSync(config.docsRoot)) {
-    console.warn(`Docs root directory does not exist: ${config.docsRoot}`);
-    fs.mkdirSync(config.docsRoot, { recursive: true });
-    console.log(`Created docs root directory: ${config.docsRoot}`);
+    throw new Error(`Docs root directory does not exist: ${config.docsRoot}`);
   }
 }
