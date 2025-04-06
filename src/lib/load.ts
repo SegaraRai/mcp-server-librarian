@@ -202,6 +202,7 @@ export function filterDocuments(
   cache: DocumentCache,
   directory: string = "/",
   tags: string[] = [],
+  depth: number = -1,
 ): Document[] {
   const normalizedDir = directory.startsWith("/")
     ? directory.substring(1)
@@ -209,9 +210,41 @@ export function filterDocuments(
   const dirPrefix = normalizedDir === "" ? "" : `${normalizedDir}/`;
 
   // Filter by directory
-  const dirFiltered = cache.documents.filter(
-    (doc) => normalizedDir === "" || doc.filepath.startsWith(dirPrefix),
-  );
+  const dirFiltered = cache.documents.filter((doc) => {
+    // If directory is root, include all documents
+    if (normalizedDir === "") {
+      return true;
+    }
+    
+    // Check if document is in the specified directory
+    if (!doc.filepath.startsWith(dirPrefix)) {
+      return false;
+    }
+    
+    // If depth is -1, include all documents in the directory
+    if (depth === -1) {
+      return true;
+    }
+    
+    // Calculate the relative path from the specified directory
+    const relativePath = doc.filepath.substring(dirPrefix.length);
+    
+    // If relativePath is empty, it's the directory itself or an index file
+    if (relativePath === "" || relativePath === "index.md") {
+      return true;
+    }
+    
+    // Count the number of directory separators to determine depth
+    const pathDepth = relativePath.split("/").filter(Boolean).length;
+    
+    // For depth=0, only include the index.md file in the exact directory
+    if (depth === 0) {
+      return relativePath === "index.md";
+    }
+    
+    // Include the document if its depth is within the specified limit
+    return pathDepth <= depth;
+  });
 
   // Filter by tags
   if (tags.length === 0) {
@@ -234,9 +267,10 @@ export function searchDocuments(
   includeContents: boolean = false,
   mode: "string" | "regex" = "string",
   caseSensitive: boolean = false,
+  depth: number = -1,
 ): Document[] {
   // First filter by directory and tags
-  const filtered = filterDocuments(cache, directory, tags);
+  const filtered = filterDocuments(cache, directory, tags, depth);
 
   // Create regex flags based on parameters
   const flags = caseSensitive ? "g" : "gi";
@@ -294,9 +328,10 @@ export function getTagsInDirectory(
   cache: DocumentCache,
   directory: string = "/",
   includeFilepaths: boolean = false,
+  depth: number = -1,
 ): { tag: string; count: number; filepaths?: string[] }[] {
   // Filter documents by directory
-  const documents = filterDocuments(cache, directory, []);
+  const documents = filterDocuments(cache, directory, [], depth);
 
   // Count tags and collect filepaths
   const tagCounts = new Map<string, number>();

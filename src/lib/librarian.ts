@@ -26,6 +26,10 @@ export const listDocumentsSchema = z.object({
     .boolean()
     .default(false)
     .describe("Whether to include document contents in results"),
+  depth: z
+    .number()
+    .default(-1)
+    .describe("Maximum directory depth to traverse (-1 for infinite)"),
 });
 
 /**
@@ -58,6 +62,10 @@ export const searchDocumentsSchema = z.object({
     .boolean()
     .default(false)
     .describe("Whether to include document contents in results"),
+  depth: z
+    .number()
+    .default(-1)
+    .describe("Maximum directory depth to traverse (-1 for infinite)"),
 });
 
 /**
@@ -89,6 +97,10 @@ export const listTagsSchema = z.object({
     .boolean()
     .default(false)
     .describe("Whether to include file paths for each tag"),
+  depth: z
+    .number()
+    .default(-1)
+    .describe("Maximum directory depth to traverse (-1 for infinite)"),
 });
 
 /**
@@ -137,10 +149,10 @@ export class Librarian {
    * List documents with optional filtering by directory and tags
    */
   async listDocuments(params: ListDocumentsParams): Promise<Document[]> {
-    const { directory, tags, includeContents } = params;
+    const { directory, tags, includeContents, depth } = params;
     const cache = await this.ensureDocumentsLoaded();
 
-    const documents = filterDocuments(cache, directory, tags);
+    const documents = filterDocuments(cache, directory, tags, depth);
 
     // Remove contents if not requested
     if (!includeContents) {
@@ -154,7 +166,7 @@ export class Librarian {
    * Search documents using string or regex patterns
    */
   async searchDocuments(params: SearchDocumentsParams): Promise<Document[]> {
-    const { query, mode, caseSensitive, directory, tags, includeContents } =
+    const { query, mode, caseSensitive, directory, tags, includeContents, depth } =
       params;
     const cache = await this.ensureDocumentsLoaded();
 
@@ -166,6 +178,7 @@ export class Librarian {
       includeContents,
       mode,
       caseSensitive,
+      depth,
     );
   }
 
@@ -185,9 +198,9 @@ export class Librarian {
   async listTags(
     params: ListTagsParams,
   ): Promise<{ tag: string; count: number; filepaths?: string[] }[]> {
-    const { directory, includeFilepaths } = params;
+    const { directory, includeFilepaths, depth } = params;
     const cache = await this.ensureDocumentsLoaded();
 
-    return getTagsInDirectory(cache, directory, includeFilepaths);
+    return getTagsInDirectory(cache, directory, includeFilepaths, depth);
   }
 }

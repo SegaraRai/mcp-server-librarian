@@ -135,9 +135,10 @@ The Librarian MCP server provides the following tools:
 Lists all documents with optional filtering by directory and tags.
 
 **Parameters:**
-
 - `directory` (optional): The directory path to list documents from (default: "/")
 - `tags` (optional): Array of tags to filter by (default: [])
+- `includeContents` (optional): Whether to include document contents in results (default: false)
+- `depth` (optional): Maximum directory depth to traverse (-1 for infinite, default: -1)
 - `includeContents` (optional): Whether to include document contents in results (default: false)
 
 **Response:**
@@ -174,6 +175,7 @@ Searches document content using string or regex patterns.
 - `directory` (optional): The directory path to search in (default: "/")
 - `tags` (optional): Array of tags to filter by (default: [])
 - `includeContents` (optional): Whether to include document contents in results (default: false)
+- `depth` (optional): Maximum directory depth to traverse (-1 for infinite, default: -1)
 
 **Response:**
 
@@ -222,6 +224,7 @@ Lists all tags with counts and optional filepaths.
 
 - `directory` (optional): The directory path to list tags from (default: "/")
 - `includeFilepaths` (optional): Whether to include filepaths in results (default: false)
+- `depth` (optional): Maximum directory depth to traverse (-1 for infinite, default: -1)
 
 **Response:**
 
@@ -276,6 +279,12 @@ const uiDocs = await mcp.useTool("librarian", "listDocuments", {
 const buttonDocs = await mcp.useTool("librarian", "listDocuments", {
   tags: ["button", "interactive"],
 });
+
+// List documents with depth limit
+const topLevelDocs = await mcp.useTool("librarian", "listDocuments", {
+  directory: "/daisyui",
+  depth: 1, // Only include direct children, not nested subdirectories
+});
 ```
 
 #### Searching Documents
@@ -299,6 +308,13 @@ const filteredResults = await mcp.useTool("librarian", "searchDocuments", {
   query: "installation",
   tags: ["tutorial"],
   directory: "/tailwind4",
+});
+
+// Search with depth limit
+const topLevelResults = await mcp.useTool("librarian", "searchDocuments", {
+  query: "component",
+  directory: "/daisyui",
+  depth: 1, // Only search in direct children, not nested subdirectories
 });
 ```
 
@@ -325,6 +341,12 @@ const tailwindTags = await mcp.useTool("librarian", "listTags", {
 // List tags with filepaths
 const tagsWithFiles = await mcp.useTool("librarian", "listTags", {
   includeFilepaths: true,
+});
+
+// List tags with depth limit
+const topLevelTags = await mcp.useTool("librarian", "listTags", {
+  directory: "/daisyui",
+  depth: 1, // Only include tags from direct children, not nested subdirectories
 });
 ```
 

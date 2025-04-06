@@ -141,7 +141,7 @@ describe("createLibrarianServer", () => {
     });
 
     it("listDocuments callback should return formatted documents", async () => {
-      const result = await listDocumentsCallback({ directory: "/", tags: [] });
+      const result = await listDocumentsCallback({ directory: "/", tags: [], depth: -1 });
 
       expect(result).toEqual({
         content: [
@@ -159,6 +159,7 @@ describe("createLibrarianServer", () => {
         directory: "/",
         tags: [],
         includeContents: false,
+        depth: -1,
       });
 
       expect(result).toEqual({
@@ -188,6 +189,7 @@ describe("createLibrarianServer", () => {
       const result = await listTagsCallback({
         directory: "/",
         includeFilepaths: false,
+        depth: -1,
       });
 
       expect(result).toEqual({
@@ -225,7 +227,7 @@ describe("createLibrarianServer", () => {
         }
       };
 
-      const errorResult = await errorCallback({ directory: "/", tags: [] });
+      const errorResult = await errorCallback({ directory: "/", tags: [], depth: -1 });
 
       expect(errorResult).toHaveProperty("isError", true);
       expect(errorResult.content[0].text).toContain("Failed to list documents");

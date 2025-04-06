@@ -33,7 +33,7 @@ vi.mock("./load.js", () => {
     loadAllDocuments: vi.fn().mockResolvedValue(mockCache),
     filterDocuments: vi
       .fn()
-      .mockImplementation((cache, directory = "/", tags = []) => {
+      .mockImplementation((cache, directory = "/", tags = [], depth = -1) => {
         if (tags.length > 0) {
           return mockDocuments.filter((doc) =>
             tags.some((tag: string) => doc.tags.includes(tag)),
@@ -44,7 +44,7 @@ vi.mock("./load.js", () => {
     searchDocuments: vi
       .fn()
       .mockImplementation(
-        (cache, query, directory = "/", tags = [], includeContents = false) => {
+        (cache, query, directory = "/", tags = [], includeContents = false, mode = "string", caseSensitive = false, depth = -1) => {
           const results = mockDocuments.filter((doc) =>
             doc.contents?.includes(query),
           );
@@ -66,7 +66,7 @@ vi.mock("./load.js", () => {
     getTagsInDirectory: vi
       .fn()
       .mockImplementation(
-        (cache, directory = "/", includeFilepaths = false) => {
+        (cache, directory = "/", includeFilepaths = false, depth = -1) => {
           const tags = [
             { tag: "tag1", count: 1 },
             { tag: "tag2", count: 2 },
@@ -101,6 +101,7 @@ describe("Librarian", () => {
         directory: "/",
         tags: [],
         includeContents: false,
+        depth: -1,
       });
 
       // Verify loadAllDocuments was called
@@ -124,11 +125,38 @@ describe("Librarian", () => {
         directory: "/",
         tags: ["tag1"],
         includeContents: false,
+        depth: -1,
       });
 
       // Verify the result only includes documents with tag1
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty("filepath", "doc1.md");
+    });
+
+    it("should respect the depth parameter", async () => {
+      // Set up a specific mock implementation for this test
+      vi.mocked(loadModule.filterDocuments).mockImplementationOnce(
+        (cache, directory, tags, depth) => {
+          // Verify depth parameter is passed correctly
+          expect(depth).toBe(1);
+          return [
+            {
+              filepath: "doc1.md",
+              tags: ["tag1", "tag2"],
+            },
+          ];
+        },
+      );
+
+      const result = await librarian.listDocuments({
+        directory: "/",
+        tags: [],
+        includeContents: false,
+        depth: 1,
+      });
+
+      // Verify the result
+      expect(result).toHaveLength(1);
     });
   });
 
@@ -198,6 +226,7 @@ describe("Librarian", () => {
       const result = await librarian.listTags({
         directory: "/",
         includeFilepaths: false,
+        depth: -1,
       });
 
       // Verify loadAllDocuments was called
@@ -221,11 +250,34 @@ describe("Librarian", () => {
       const result = await librarian.listTags({
         directory: "/",
         includeFilepaths: true,
+        depth: -1,
       });
 
       // Verify filepaths are included
       expect(result[0]).toHaveProperty("filepaths");
       expect(result[0].filepaths).toContain("doc1.md");
+    });
+
+    it("should respect the depth parameter", async () => {
+      // Set up a specific mock implementation for this test
+      vi.mocked(loadModule.getTagsInDirectory).mockImplementationOnce(
+        (cache, directory, includeFilepaths, depth) => {
+          // Verify depth parameter is passed correctly
+          expect(depth).toBe(1);
+          return [
+            { tag: "tag1", count: 1 },
+          ];
+        },
+      );
+
+      const result = await librarian.listTags({
+        directory: "/",
+        includeFilepaths: false,
+        depth: 1,
+      });
+
+      // Verify the result
+      expect(result).toHaveLength(1);
     });
   });
 
@@ -240,6 +292,7 @@ describe("Librarian", () => {
       // Call a method to load the cache
       await testLibrarian.listDocuments({
         directory: "/",
+        depth: -1,
       });
 
       // Verify loadAllDocuments was called
@@ -267,6 +320,7 @@ describe("Librarian", () => {
       // Call a method again
       await testLibrarian.listDocuments({
         directory: "/",
+        depth: -1,
       });
 
       // Verify loadAllDocuments was called again
