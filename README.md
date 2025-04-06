@@ -130,6 +130,30 @@ You can describe a folder itself by creating an `index.md` file within that fold
 
 The Librarian MCP server provides the following tools:
 
+### getDocuments
+
+Retrieves multiple documents by their paths.
+
+**Parameters:**
+
+- `filepaths`: Array of file paths to retrieve
+
+**Response:**
+
+```
+**/path/to/document1.md**
+- tags: tag1, tag2, tag3
+======
+Document 1 content with frontmatter
+======
+
+**/path/to/document2.md**
+- tags: tag1, tag4, tag5
+======
+Document 2 content with frontmatter
+======
+```
+
 ### listDocuments
 
 Lists all documents with optional filtering by directory and tags.
@@ -325,6 +349,18 @@ const topLevelResults = await mcp.useTool("librarian", "searchDocuments", {
 // Get a specific document
 const document = await mcp.useTool("librarian", "getDocument", {
   filepath: "/daisyui/components/button.md",
+});
+```
+
+#### Retrieving Multiple Documents
+
+```javascript
+// Get multiple specific documents
+const documents = await mcp.useTool("librarian", "getDocuments", {
+  filepaths: [
+    "/daisyui/components/button.md",
+    "/daisyui/components/card.md"
+  ],
 });
 ```
 

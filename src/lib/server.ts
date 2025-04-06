@@ -5,6 +5,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { LibrarianConfig } from "./config.js";
 import {
   getDocumentSchema,
+  getDocumentsSchema,
   Librarian,
   listDocumentsSchema,
   listTagsSchema,
@@ -126,6 +127,36 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
           {
             type: "text",
             text: `Failed to get document: ${error.message || "Unknown error"}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  });
+
+  // Add getDocuments tool
+  server.tool("getDocuments", getDocumentsSchema.shape, async (args, extra) => {
+    try {
+      const documents = await librarian.getDocuments(args);
+
+      // Format the documents
+      const formattedText = formatDocumentListWithContents(documents);
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: formattedText,
+          },
+        ],
+      };
+    } catch (error: any) {
+      console.error("Error in getDocuments:", error);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to get documents: ${error.message || "Unknown error"}`,
           },
         ],
         isError: true,

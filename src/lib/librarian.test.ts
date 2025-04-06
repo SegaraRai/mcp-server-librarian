@@ -230,6 +230,50 @@ describe("Librarian", () => {
     });
   });
 
+  describe("getDocuments", () => {
+    it("should call loadAllDocuments and getDocument for each filepath", async () => {
+      const result = await librarian.getDocuments({
+        filepaths: ["doc1.md", "doc2.md"]
+      });
+
+      // Verify loadAllDocuments was called
+      expect(loadModule.loadAllDocuments).toHaveBeenCalledWith("/test/docs");
+
+      // Verify getDocument was called for each filepath
+      expect(loadModule.getDocument).toHaveBeenCalledTimes(2);
+      
+      // Verify the result
+      expect(result).toHaveLength(2);
+      expect(result[0]).toHaveProperty("filepath", "doc1.md");
+      expect(result[0]).toHaveProperty("contents", "Content of doc1");
+      expect(result[1]).toHaveProperty("filepath", "doc2.md");
+      expect(result[1]).toHaveProperty("contents", "Content of doc2");
+    });
+
+    it("should handle non-existent documents gracefully", async () => {
+      // Override the mock for this test
+      vi.mocked(loadModule.getDocument)
+        .mockImplementationOnce((cache, filepath) => {
+          return {
+            filepath: "doc1.md",
+            tags: ["tag1", "tag2"],
+            contents: "Content of doc1",
+          };
+        })
+        .mockImplementationOnce((cache, filepath) => {
+          throw new Error("Document not found: non-existent.md");
+        });
+
+      const result = await librarian.getDocuments({
+        filepaths: ["doc1.md", "non-existent.md"]
+      });
+
+      // Verify only the existing document is returned
+      expect(result).toHaveLength(1);
+      expect(result[0]).toHaveProperty("filepath", "doc1.md");
+    });
+  });
+
   describe("listTags", () => {
     it("should call loadAllDocuments and getTagsInDirectory", async () => {
       const result = await librarian.listTags({

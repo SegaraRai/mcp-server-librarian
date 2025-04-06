@@ -19,6 +19,18 @@ vi.mock("./librarian.js", () => {
         tags: ["tag1", "tag2"],
         contents: "Content of doc1",
       }),
+      getDocuments: vi.fn().mockResolvedValue([
+        {
+          filepath: "doc1.md",
+          tags: ["tag1", "tag2"],
+          contents: "Content of doc1",
+        },
+        {
+          filepath: "doc2.md",
+          tags: ["tag2", "tag3"],
+          contents: "Content of doc2",
+        },
+      ]),
       listTags: vi.fn().mockResolvedValue([
         { tag: "tag1", count: 1 },
         { tag: "tag2", count: 2 },
@@ -28,6 +40,7 @@ vi.mock("./librarian.js", () => {
     listDocumentsSchema: { shape: {} },
     searchDocumentsSchema: { shape: {} },
     getDocumentSchema: { shape: {} },
+    getDocumentsSchema: { shape: {} },
     listTagsSchema: { shape: {} },
   };
 });
@@ -102,6 +115,14 @@ describe("createLibrarianServer", () => {
     );
   });
 
+  it("should register the getDocuments tool", () => {
+    expect(server.tool).toHaveBeenCalledWith(
+      "getDocuments",
+      expect.anything(),
+      expect.any(Function),
+    );
+  });
+
   it("should register the listTags tool", () => {
     expect(server.tool).toHaveBeenCalledWith(
       "listTags",
@@ -116,6 +137,7 @@ describe("createLibrarianServer", () => {
     let listDocumentsCallback: Function;
     let searchDocumentsCallback: Function;
     let getDocumentCallback: Function;
+    let getDocumentsCallback: Function;
     let listTagsCallback: Function;
 
     beforeEach(() => {
@@ -133,6 +155,10 @@ describe("createLibrarianServer", () => {
 
       getDocumentCallback = server.tool.mock.calls.find(
         (call: any[]) => call[0] === "getDocument",
+      )[2];
+
+      getDocumentsCallback = server.tool.mock.calls.find(
+        (call: any[]) => call[0] === "getDocuments",
       )[2];
 
       listTagsCallback = server.tool.mock.calls.find(
@@ -184,6 +210,21 @@ describe("createLibrarianServer", () => {
           {
             type: "text",
             text: "Formatted document",
+          },
+        ],
+      });
+    });
+
+    it("getDocuments callback should return formatted documents", async () => {
+      const result = await getDocumentsCallback({
+        filepaths: ["doc1.md", "doc2.md"]
+      });
+
+      expect(result).toEqual({
+        content: [
+          {
+            type: "text",
+            text: "Formatted document list with contents",
           },
         ],
       });
