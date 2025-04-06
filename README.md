@@ -135,6 +135,7 @@ The Librarian MCP server provides the following tools:
 Lists all documents with optional filtering by directory and tags.
 
 **Parameters:**
+
 - `directory` (optional): The directory path to list documents from (default: "/")
 - `tags` (optional): Array of tags to filter by (default: [])
 - `includeContents` (optional): Whether to include document contents in results (default: false)

@@ -8,7 +8,7 @@
  * @returns The normalized path with a leading slash
  */
 export function normalizePath(path: string): string {
-  return path.startsWith("/") ? path : `/${path}`;
+  return `/${path.replace(/^\/+/, "").replace(/\/+$/, "")}`;
 }
 
 /**

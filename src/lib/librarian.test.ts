@@ -44,7 +44,16 @@ vi.mock("./load.js", () => {
     searchDocuments: vi
       .fn()
       .mockImplementation(
-        (cache, query, directory = "/", tags = [], includeContents = false, mode = "string", caseSensitive = false, depth = -1) => {
+        (
+          cache,
+          query,
+          directory = "/",
+          tags = [],
+          includeContents = false,
+          mode = "string",
+          caseSensitive = false,
+          depth = -1,
+        ) => {
           const results = mockDocuments.filter((doc) =>
             doc.contents?.includes(query),
           );
@@ -264,9 +273,7 @@ describe("Librarian", () => {
         (cache, directory, includeFilepaths, depth) => {
           // Verify depth parameter is passed correctly
           expect(depth).toBe(1);
-          return [
-            { tag: "tag1", count: 1 },
-          ];
+          return [{ tag: "tag1", count: 1 }];
         },
       );
 

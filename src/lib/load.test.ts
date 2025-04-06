@@ -73,6 +73,7 @@ describe("filterDocuments", () => {
       allTags: ["parent", "child", "nested", "deep"],
     };
   }
+
   it("should filter documents by directory", () => {
     const tailwindDocs = filterDocuments(documentCache, "/tailwind");
 
@@ -291,8 +292,11 @@ describe("searchDocuments", () => {
       false,
       1,
     );
-    expect(resultsDepth1.length).toBe(1);
-    expect(resultsDepth1[0].filepath).toBe("/parent/index.md");
+    expect(resultsDepth1.length).toBe(2);
+    expect(resultsDepth1.map((d) => d.filepath).sort()).toEqual([
+      "/parent/child1.md",
+      "/parent/index.md",
+    ]);
 
     // Test with depth=2
     const resultsDepth2 = searchDocuments(
@@ -305,8 +309,9 @@ describe("searchDocuments", () => {
       false,
       2,
     );
-    expect(resultsDepth2.length).toBe(2);
+    expect(resultsDepth2.length).toBe(3);
     expect(resultsDepth2.map((d) => d.filepath).sort()).toEqual([
+      "/parent/child1.md",
       "/parent/index.md",
       "/parent/nested/child2.md",
     ]);
@@ -322,7 +327,13 @@ describe("searchDocuments", () => {
       false,
       -1,
     );
-    expect(resultsAll.length).toBe(2);
+    expect(resultsAll.length).toBe(4);
+    expect(resultsAll.map((d) => d.filepath).sort()).toEqual([
+      "/parent/child1.md",
+      "/parent/index.md",
+      "/parent/nested/child2.md",
+      "/parent/nested/deep/child3.md",
+    ]);
   });
 });
 
@@ -385,6 +396,7 @@ describe("getTagsInDirectory", () => {
       allTags: ["parent-tag", "child-tag", "nested-tag", "deep-tag"],
     };
   }
+
   it("should get all tags in the root directory", () => {
     const tags = getTagsInDirectory(documentCache);
 

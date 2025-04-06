@@ -166,8 +166,15 @@ export class Librarian {
    * Search documents using string or regex patterns
    */
   async searchDocuments(params: SearchDocumentsParams): Promise<Document[]> {
-    const { query, mode, caseSensitive, directory, tags, includeContents, depth } =
-      params;
+    const {
+      query,
+      mode,
+      caseSensitive,
+      directory,
+      tags,
+      includeContents,
+      depth,
+    } = params;
     const cache = await this.ensureDocumentsLoaded();
 
     return searchDocs(

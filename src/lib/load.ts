@@ -212,44 +212,34 @@ export function filterDocuments(
   depth: number = -1,
 ): Document[] {
   // Remove the leading "/" for directory comparison
-  const normalizedDir = removeLeadingSlash(directory);
-  const dirPrefix = normalizedDir === "" ? "" : `${normalizedDir}/`;
+  const normalizedDir = normalizePath(directory);
+  const dirPrefix = normalizedDir === "/" ? "/" : `${normalizedDir}/`;
 
   // Filter by directory
   const dirFiltered = cache.documents.filter((doc) => {
-    // If directory is root, include all documents
-    if (normalizedDir === "") {
-      return true;
-    }
-    
     // Check if document is in the specified directory
     // Remove the leading "/" from the filepath for comparison
-    const normalizedFilepath = removeLeadingSlash(doc.filepath);
+    const normalizedFilepath = normalizePath(doc.filepath);
     if (!normalizedFilepath.startsWith(dirPrefix)) {
       return false;
     }
-    
+
     // If depth is -1, include all documents in the directory
-    if (depth === -1) {
+    if (depth < 0) {
       return true;
     }
-    
+
     // Calculate the relative path from the specified directory
     const relativePath = normalizedFilepath.substring(dirPrefix.length);
-    
+
     // If relativePath is empty, it's the directory itself or an index file
     if (relativePath === "" || relativePath === "index.md") {
       return true;
     }
-    
+
     // Count the number of directory separators to determine depth
     const pathDepth = relativePath.split("/").filter(Boolean).length;
-    
-    // For depth=0, only include the index.md file in the exact directory
-    if (depth === 0) {
-      return relativePath === "index.md";
-    }
-    
+
     // Include the document if its depth is within the specified limit
     return pathDepth <= depth;
   });
@@ -301,9 +291,10 @@ export function searchDocuments(
   }
 
   // Search in document contents
-  const results = filtered.filter(
-    (doc) => doc.contents && pattern.test(doc.contents),
-  );
+  const results = filtered.filter((doc) => {
+    pattern.lastIndex = 0; // Reset regex index for each document
+    return doc.contents != null && pattern.test(doc.contents);
+  });
 
   // Remove contents if not requested
   if (!includeContents) {
