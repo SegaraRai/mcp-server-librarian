@@ -189,9 +189,9 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
   const { knowledgeStructuringSessionManager } = librarian;
   if (knowledgeStructuringSessionManager) {
     // Add knowledgeStructure prompt
-    server.prompt(
+    server.tool(
       "knowledgeStructure",
-      "A prompt for knowledge structuring",
+      "Instructs you to start a knowledge structuring session. Only use this tool when the user explicitly asks for it.",
       startPendingSessionSchema.shape,
       async (args, extra) => {
         try {
@@ -203,13 +203,10 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
             });
 
           return {
-            messages: [
+            content: [
               {
-                role: "user",
-                content: {
-                  type: "text",
-                  text: response,
-                },
+                type: "text",
+                text: response,
               },
             ],
           };
@@ -217,13 +214,11 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
           console.error("Error in knowledgeStructure prompt:", error);
 
           return {
-            messages: [
+            isError: true,
+            content: [
               {
-                role: "assistant",
-                content: {
-                  type: "text",
-                  text: `Failed to start pending knowledge structuring session: ${error.message || "Unknown error"}`,
-                },
+                type: "text",
+                text: `Failed to start pending knowledge structuring session: ${error.message || "Unknown error"}`,
               },
             ],
           };
