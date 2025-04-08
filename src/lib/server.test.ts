@@ -75,7 +75,7 @@ describe("createLibrarianServer", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    server = createLibrarianServer({ docsRoot: "/test/docs" });
+    server = createLibrarianServer({ docsRoot: "/test/docs", enableWriteOperations: true });
   });
 
   it("should create an MCP server with the correct configuration", () => {
@@ -83,17 +83,18 @@ describe("createLibrarianServer", () => {
       name: "Librarian",
       version: "1.0.0",
       description:
-        "A server for listing, searching, and retrieving markdown files",
+        "A server for listing, searching, and retrieving documents curated exclusively for the project. If you want to know about project-specific knowledge or rules, you should first use the tools on this server to acquire the knowledge you need.",
     });
   });
 
   it("should create a Librarian instance with the provided config", () => {
-    expect(Librarian).toHaveBeenCalledWith({ docsRoot: "/test/docs" });
+    expect(Librarian).toHaveBeenCalledWith({ docsRoot: "/test/docs", enableWriteOperations: true });
   });
 
   it("should register the listDocuments tool", () => {
     expect(server.tool).toHaveBeenCalledWith(
       "listDocuments",
+      "Lists documents in the specified directory (defaults to the root dir), optionally filtering by tags and including contents.",
       expect.anything(),
       expect.any(Function),
     );
@@ -102,14 +103,7 @@ describe("createLibrarianServer", () => {
   it("should register the searchDocuments tool", () => {
     expect(server.tool).toHaveBeenCalledWith(
       "searchDocuments",
-      expect.anything(),
-      expect.any(Function),
-    );
-  });
-
-  it("should register the getDocument tool", () => {
-    expect(server.tool).toHaveBeenCalledWith(
-      "getDocument",
+      "Searches documents in the specified directory (defaults to the root dir), optionally filtering by tags and including contents.",
       expect.anything(),
       expect.any(Function),
     );
@@ -118,6 +112,16 @@ describe("createLibrarianServer", () => {
   it("should register the getDocuments tool", () => {
     expect(server.tool).toHaveBeenCalledWith(
       "getDocuments",
+      "Retrieves documents in the specified directory (defaults to the root dir), optionally filtering by tags and including contents.",
+      expect.anything(),
+      expect.any(Function),
+    );
+  });
+
+  it("should register the getDocuments tool", () => {
+    expect(server.tool).toHaveBeenCalledWith(
+      "getDocuments",
+      "Retrieves documents in the specified directory (defaults to the root dir), optionally filtering by tags and including contents.",
       expect.anything(),
       expect.any(Function),
     );
@@ -126,6 +130,7 @@ describe("createLibrarianServer", () => {
   it("should register the listTags tool", () => {
     expect(server.tool).toHaveBeenCalledWith(
       "listTags",
+      "Lists all tags in the specified directory (defaults to the root dir).",
       expect.anything(),
       expect.any(Function),
     );
@@ -136,34 +141,31 @@ describe("createLibrarianServer", () => {
     // Extract the callbacks
     let listDocumentsCallback: Function;
     let searchDocumentsCallback: Function;
-    let getDocumentCallback: Function;
     let getDocumentsCallback: Function;
     let listTagsCallback: Function;
 
     beforeEach(() => {
       // Reset the server
-      server = createLibrarianServer({ docsRoot: "/test/docs" });
+      server = createLibrarianServer({ docsRoot: "/test/docs", enableWriteOperations: true });
 
       // Extract the callbacks
       listDocumentsCallback = server.tool.mock.calls.find(
         (call: any[]) => call[0] === "listDocuments",
-      )[2];
+      )[3];
 
       searchDocumentsCallback = server.tool.mock.calls.find(
         (call: any[]) => call[0] === "searchDocuments",
-      )[2];
+      )[3];
 
-      getDocumentCallback = server.tool.mock.calls.find(
-        (call: any[]) => call[0] === "getDocument",
-      )[2];
+      // getDocumentCallback is no longer needed
 
       getDocumentsCallback = server.tool.mock.calls.find(
         (call: any[]) => call[0] === "getDocuments",
-      )[2];
+      )[3];
 
       listTagsCallback = server.tool.mock.calls.find(
         (call: any[]) => call[0] === "listTags",
-      )[2];
+      )[3];
     });
 
     it("listDocuments callback should return formatted documents", async () => {
@@ -202,18 +204,7 @@ describe("createLibrarianServer", () => {
       });
     });
 
-    it("getDocument callback should return a formatted document", async () => {
-      const result = await getDocumentCallback({ filepath: "/doc1.md" });
-
-      expect(result).toEqual({
-        content: [
-          {
-            type: "text",
-            text: "Formatted document",
-          },
-        ],
-      });
-    });
+    // Skip this test since getDocument tool doesn't exist anymore
 
     it("getDocuments callback should return formatted documents", async () => {
       const result = await getDocumentsCallback({

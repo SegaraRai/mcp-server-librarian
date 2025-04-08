@@ -199,7 +199,7 @@ export class Librarian {
   /**
    * Get a specific document by path
    */
-  async getDocument(params: GetDocumentParams): Promise<Document> {
+  async getDocument(params: GetDocumentParams): Promise<Document | null> {
     const { filepath } = params;
     const cache = await this.ensureDocumentsLoaded();
 

@@ -333,16 +333,13 @@ export function searchDocuments(
 /**
  * Get a document by filepath
  */
-export function getDocument(cache: DocumentCache, filepath: string): Document {
+export function getDocument(
+  cache: DocumentCache,
+  filepath: string,
+): Document | null {
   // Ensure filepath has a leading "/"
   const normalizedPath = normalizePath(filepath);
-
-  const doc = cache.documentMap.get(normalizedPath);
-  if (!doc) {
-    throw new Error(`Document not found: ${filepath}`);
-  }
-
-  return doc;
+  return cache.documentMap.get(normalizedPath) ?? null;
 }
 
 /**

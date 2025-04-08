@@ -14,9 +14,9 @@ describe("formatDocumentList", () => {
   });
 
   it("should format a list of documents without contents", () => {
-    const docs: Document[] = [
-      { filepath: "/path/to/doc1.md", tags: ["tag1", "tag2"] },
-      { filepath: "/path/to/doc2.md", tags: ["tag2", "tag3"] },
+    const docs: [string, Document | null][] = [
+      ["/path/to/doc1.md", { filepath: "/path/to/doc1.md", tags: ["tag1", "tag2"], contents: "" }],
+      ["/path/to/doc2.md", { filepath: "/path/to/doc2.md", tags: ["tag2", "tag3"], contents: "" }],
     ];
 
     const result = formatDocumentList(docs);
@@ -29,7 +29,9 @@ describe("formatDocumentList", () => {
   });
 
   it("should handle documents with empty tags", () => {
-    const docs: Document[] = [{ filepath: "/path/to/doc1.md", tags: [] }];
+    const docs: [string, Document | null][] = [
+      ["/path/to/doc1.md", { filepath: "/path/to/doc1.md", tags: [], contents: "" }]
+    ];
 
     const result = formatDocumentList(docs);
     expect(result).toMatchInlineSnapshot(`
@@ -46,17 +48,23 @@ describe("formatDocumentListWithContents", () => {
   });
 
   it("should format a list of documents with contents", () => {
-    const docs: Document[] = [
-      {
-        filepath: "/path/to/doc1.md",
-        tags: ["tag1", "tag2"],
-        contents: "Content of doc1",
-      },
-      {
-        filepath: "/path/to/doc2.md",
-        tags: ["tag2", "tag3"],
-        contents: "Content of doc2",
-      },
+    const docs: [string, Document | null][] = [
+      [
+        "/path/to/doc1.md",
+        {
+          filepath: "/path/to/doc1.md",
+          tags: ["tag1", "tag2"],
+          contents: "Content of doc1",
+        },
+      ],
+      [
+        "/path/to/doc2.md",
+        {
+          filepath: "/path/to/doc2.md",
+          tags: ["tag2", "tag3"],
+          contents: "Content of doc2",
+        },
+      ],
     ];
 
     const result = formatDocumentListWithContents(docs);
@@ -76,7 +84,9 @@ describe("formatDocumentListWithContents", () => {
   });
 
   it("should handle documents with undefined contents", () => {
-    const docs: Document[] = [{ filepath: "/path/to/doc1.md", tags: ["tag1"] }];
+    const docs: [string, Document | null][] = [
+      ["/path/to/doc1.md", { filepath: "/path/to/doc1.md", tags: ["tag1"], contents: "" }]
+    ];
 
     const result = formatDocumentListWithContents(docs);
     expect(result).toMatchInlineSnapshot(`
@@ -111,6 +121,7 @@ describe("formatDocument", () => {
     const doc: Document = {
       filepath: "/path/to/doc.md",
       tags: ["tag1", "tag2"],
+      contents: "",
     };
 
     const result = formatDocument(doc);

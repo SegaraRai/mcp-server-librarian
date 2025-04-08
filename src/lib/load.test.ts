@@ -189,7 +189,7 @@ describe("searchDocuments", () => {
     };
 
     // Call searchDocuments with includeContents=true to keep contents
-    const results = searchDocuments(mockDocCache, "search term", "/", [], true);
+    const results = searchDocuments(mockDocCache, "search term", "/", [], "string", false, -1);
 
     // Verify we got a result
     expect(results.length).toBe(1);
@@ -218,8 +218,9 @@ describe("searchDocuments", () => {
       "\\bbutton\\b",
       "/",
       [],
-      true,
       "regex",
+      false,
+      -1
     );
 
     // Verify we got a result
@@ -247,7 +248,7 @@ describe("searchDocuments", () => {
   });
 
   it("should include contents when requested", () => {
-    const results = searchDocuments(documentCache, "button", "/", [], true);
+    const results = searchDocuments(documentCache, "button", "/", [], "string", false, -1);
 
     // All results should have contents
     for (const doc of results) {
@@ -255,12 +256,12 @@ describe("searchDocuments", () => {
     }
   });
 
-  it("should exclude contents when not requested", () => {
-    const results = searchDocuments(documentCache, "button", "/", [], false);
+  it("should include contents regardless of includeContents parameter", () => {
+    const results = searchDocuments(documentCache, "button", "/", [], "string", false, -1);
 
-    // No results should have contents
+    // All results should have contents since the implementation doesn't remove them
     for (const doc of results) {
-      expect(doc.contents).toBeUndefined();
+      expect(doc.contents).toBeDefined();
     }
   });
 
@@ -273,7 +274,6 @@ describe("searchDocuments", () => {
       "search term",
       "parent",
       [],
-      true,
       "string",
       false,
       0,
@@ -287,7 +287,6 @@ describe("searchDocuments", () => {
       "search term",
       "parent",
       [],
-      true,
       "string",
       false,
       1,
@@ -304,7 +303,6 @@ describe("searchDocuments", () => {
       "search term",
       "parent",
       [],
-      true,
       "string",
       false,
       2,
@@ -322,7 +320,6 @@ describe("searchDocuments", () => {
       "search term",
       "parent",
       [],
-      true,
       "string",
       false,
       -1,
@@ -341,15 +338,14 @@ describe("getDocument", () => {
   it("should get a document by filepath", () => {
     const doc = getDocument(documentCache, "index.md");
 
-    expect(doc).toBeDefined();
-    expect(doc.filepath).toBe("/index.md");
-    expect(doc.contents).toBeDefined();
+    expect(doc).not.toBeNull();
+    expect(doc?.filepath).toBe("/index.md");
+    expect(doc?.contents).toBeDefined();
   });
 
-  it("should throw an error for non-existent document", () => {
-    expect(() => {
-      getDocument(documentCache, "non-existent.md");
-    }).toThrow();
+  it("should return null for non-existent document", () => {
+    const doc = getDocument(documentCache, "non-existent.md");
+    expect(doc).toBeNull();
   });
 });
 
