@@ -40,6 +40,19 @@ export const showSourceDocumentSchema = z.object({
 });
 
 /**
+ * Input schema for starting a pending session
+ */
+export const startPendingSessionSchema = z.object({
+  documentName: z.string().describe("The name of the document to be structured."),
+  documentSource: z.string().describe("The source of the document to be structured. This can be a URL or a file path."),
+});
+
+/**
+ * Type for startPendingSession parameters
+ */
+export type StartPendingSessionParams = z.input<typeof startPendingSessionSchema>;
+
+/**
  * Type for showSourceDocument parameters
  */
 export type ShowSourceDocumentParams = z.input<typeof showSourceDocumentSchema>;
@@ -78,6 +91,12 @@ export type EndSessionParams = z.input<typeof endSessionSchema>;
  */
 export class KnowledgeStructuringSessionManager {
   private sessions: Map<string, SessionData> = new Map();
+  private pendingSessions: Map<string, {
+    documentName: string;
+    documentSource: string;
+    sourceDocument: string;
+    timestamp: number
+  }> = new Map();
   private docsRoot: string;
 
   constructor(docsRoot: string) {
@@ -95,11 +114,24 @@ export class KnowledgeStructuringSessionManager {
       throw new Error("Session already exists");
     }
 
+    // Check if there's a pending session with this token
+    const pendingSession = this.pendingSessions.get(sessionToken);
+    
+    if (!pendingSession) {
+      throw new Error("Pending session not found. Please start a pending session first.");
+    }
+    
+    // Use the source document from the pending session
+    const sourceDocument = pendingSession.sourceDocument;
+    
+    // Remove the pending session
+    this.pendingSessions.delete(sessionToken);
+
     // Create a new session
     const sessionData: SessionData = {
       documentName,
       documentSource,
-      sourceDocument: "<!-- Source Document -->", // In a real implementation, this would be loaded from documentSource
+      sourceDocument,
       sectionFilepaths,
       completedFilepaths: [],
       active: true,
@@ -248,6 +280,47 @@ export class KnowledgeStructuringSessionManager {
 
     // Return formatted response
     return formatEndSessionResponse(session.completedFilepaths);
+  }
+
+  /**
+   * Start a pending knowledge structuring session
+   */
+  async startPendingSession(params: StartPendingSessionParams): Promise<string> {
+    const { documentName, documentSource } = params;
+    
+    // Generate a session token (in a real implementation, this would be a secure UUID)
+    const sessionToken = `pending-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+    
+    // In a real implementation, we would load the source document from documentSource
+    const sourceDocument = "<!-- Source Document -->";
+    
+    // Store the pending session
+    this.pendingSessions.set(sessionToken, {
+      documentName,
+      documentSource,
+      sourceDocument,
+      timestamp: Date.now()
+    });
+    
+    // Generate the prompt based on IDEA.md
+    return `You are an outstanding editor, well-versed in computer science and IT, and you are good at analyzing, classifying, and structuring documents.
+Our ultimate goal is to break down a large document into sections, tag and organize them into a hierarchy of markdown files in a file tree.
+
+To get started, let's understand the outline of the document.
+Please focus on analyzing the structure of the document.
+
+1. Read the document below (Source Document) thoroughly and understand its structure.
+2. Identify the sections and subsections of the document and consider the filepath in lower-kebab-case for each. (e.g. \`/path/to/dir/getting-started.md\`).
+3. Call \`knowledgeStructuringSession.start\` with the following \`sessionToken\`, \`documentName\`, \`documentSource\`, and the filepaths you considered.
+   - \`sessionToken\`: "${sessionToken}"
+   - \`documentName\`: "${documentName}"
+   - \`documentSource\`: "${documentSource}"
+
+**Source Document:**
+
+======
+
+${sourceDocument}`;
   }
 
   /**

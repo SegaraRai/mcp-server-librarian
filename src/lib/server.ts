@@ -14,6 +14,7 @@ import {
 import {
   endSessionSchema,
   showSourceDocumentSchema,
+  startPendingSessionSchema,
   startSessionSchema,
   writeSectionSchema,
 } from "./knowledgeStructuring/session.js";
@@ -199,6 +200,47 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
       };
     }
   });
+// Add knowledgeStructure prompt
+server.prompt(
+  "knowledgeStructure",
+  "A prompt for knowledge structuring",
+  startPendingSessionSchema.shape,
+  async (args, extra) => {
+    try {
+      const { documentName, documentSource } = args;
+      const response = await librarian.getKnowledgeStructuringSessionManager().startPendingSession({
+        documentName,
+        documentSource
+      });
+      
+      return {
+        messages: [
+          {
+            role: "assistant",
+            content: {
+              type: "text",
+              text: response
+            }
+          }
+        ]
+      };
+    } catch (error: any) {
+      console.error("Error in knowledgeStructure prompt:", error);
+      return {
+        messages: [
+          {
+            role: "assistant",
+            content: {
+              type: "text",
+              text: `Failed to start pending knowledge structuring session: ${error.message || "Unknown error"}`
+            }
+          }
+        ]
+      };
+    }
+  }
+);
+
 // Add knowledgeStructuringSession.start tool
 server.tool(
   "knowledgeStructuringSession.start",
