@@ -37,7 +37,7 @@ function formatSourceDocument(
     const start = parseInt(match[1], 10) - 1;
     const end = parseInt(match[2], 10);
     const selectedLines = sourceDocumentLines.slice(start, end).join("\n");
-    return `**Source Document (L${start}-L${end}):**\n======\n${selectedLines}`;
+    return `**Source Document (L${start + 1}-L${end}):**\n======\n${selectedLines}`;
   }
 
   return `**Source Document:**\n======\n${sourceDocumentLines.join("\n")}`;
@@ -74,9 +74,7 @@ export function formatSessionStartResponse(
 ): string {
   return `OK. Call \`knowledgeStructuringSession.writeSection\` to write the structured files.
 
-${formatSessionStatus(sessionToken, remainingFiles, [])}
-
-${formatSourceDocument(sourceDocumentLines)}`;
+${formatSessionStatus(sessionToken, remainingFiles, [])}`;
 }
 
 /**
