@@ -4,6 +4,8 @@
 
 import { withLineNumber } from "../util.js";
 
+const MAX_LINES = 4000;
+
 function formatSessionStatus(
   sessionToken: string,
   remainingFiles: readonly string[],
@@ -34,36 +36,63 @@ function formatSourceDocument(
   sourceDocumentLines: readonly string[],
   range?: string,
 ): string {
-  const match = range?.match(/^\D*(\d+)-\D*(\d+)/);
+  let start = 0;
+  let end = Math.min(sourceDocumentLines.length, MAX_LINES);
+
+  const match = range?.match(/^\D*(\d+)(-(?:\D*(\d+))?)?$/);
   if (match) {
-    const start = parseInt(match[1], 10) - 1;
-    const end = parseInt(match[2], 10);
-    const selectedLines = sourceDocumentLines.slice(start, end).join("\n");
-    return `**Source Document (L${start + 1}-L${end}):**\n======\n${selectedLines}`;
+    start = parseInt(match[1], 10) - 1;
+    const orgEnd = match[2]
+      ? match[3]
+        ? parseInt(match[3], 10)
+        : sourceDocumentLines.length
+      : start + 1;
+    end = Math.min(
+      Math.max(orgEnd, start + 1),
+      sourceDocumentLines.length,
+      start + MAX_LINES,
+    );
   }
 
-  return `**Source Document:**\n======\n${sourceDocumentLines.join("\n")}`;
+  const selectedLines = sourceDocumentLines.slice(start, end).join("\n");
+  const suffix =
+    start !== 0 || end !== sourceDocumentLines.length
+      ? ` (L${start + 1}-L${end} of ${sourceDocumentLines.length} lines)`
+      : 2;
+  return `**Source Document${suffix}:**======\n${selectedLines}`;
 }
 
 export function formatInitialPrompt(
   sessionToken: string,
   sourceDocumentLines: readonly string[],
 ): string {
-  return `You are an outstanding editor, well-versed in computer science and IT, and you are good at analyzing, classifying, and structuring documents.
-Our ultimate goal is to break down a large document into sections, tag and organize them into a hierarchy of markdown files in a file tree.
+  const truncated = sourceDocumentLines.length > MAX_LINES;
 
-To get started, let's understand the outline of the document.
-Please focus on analyzing the structure of the document.
+  const steps = [
+    "Carefully analyze the Source Document below to understand its overall structure and content hierarchy.",
+    "Identify logical sections and subsections, noting their line numbers and creating appropriate lower-kebab-case filepaths for each (e.g., `[L123-L456,L500-L600] /path/to/dir/getting-started.md`).",
+    truncated
+      ? "Use `knowledgeStructuringSession.showSourceDocument` with line ranges to view additional portions of the document."
+      : "",
+    truncated
+      ? "Continue analyzing each section until you've processed the entire document."
+      : "",
+    "Once analysis is complete, call `knowledgeStructuringSession.start` with the provided session token and your planned filepath structure.",
+  ].filter(Boolean);
 
-1. Read the document below (Source Document) thoroughly and understand its structure.
-2. Identify the sections and subsections of the document and consider the filepath in lower-kebab-case for each. (e.g. \`/path/to/dir/getting-started.md\`).
-3. Call \`knowledgeStructuringSession.start\` with the following session token and the filepaths you considered."
+  return `You are an expert editor with deep knowledge of computer science and IT documentation. Your task is to analyze, classify, and structure a large document into a well-organized hierarchy.
+
+Your goal is to break down this document into logical sections and organize them into a coherent file tree of markdown files.
+
+Follow these steps to analyze and structure the document:
+
+${steps.map((step, index) => `${index + 1}. ${step}`).join("\n")}
 
 **Session Token:** \`${sessionToken}\`
 
-**Source Document:**
+**Source Document${truncated ? ` (L1-L${MAX_LINES} of ${sourceDocumentLines.length} lines)` : ""}:**
 ======
-${sourceDocumentLines.join("\n")}`;
+${sourceDocumentLines.slice(0, MAX_LINES).join("\n")}`;
 }
 
 /**
@@ -72,7 +101,6 @@ ${sourceDocumentLines.join("\n")}`;
 export function formatSessionStartResponse(
   sessionToken: string,
   remainingFiles: readonly string[],
-  sourceDocumentLines: readonly string[],
 ): string {
   return `OK. Call \`knowledgeStructuringSession.writeSections\` to write the structured files.
 

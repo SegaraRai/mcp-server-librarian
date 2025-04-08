@@ -29,6 +29,7 @@ interface PendingSessionData {
   sourceDocument: string;
   sourceDocumentLines: string[];
   sourceDocumentLinesWithoutLineNumbers: string[];
+  lastRequestedRange: string | null;
   timestamp: number;
 }
 
@@ -37,6 +38,7 @@ interface PendingSessionData {
  */
 interface SessionData extends PendingSessionData {
   commonPathPrefix: string;
+  remainingFilepaths: string[];
   sectionFilepaths: string[];
   completedFilepaths: string[];
 }
@@ -75,7 +77,7 @@ export const showSourceDocumentSchema = z.object({
     .string()
     .optional()
     .describe(
-      "The lines of the source document to be shown. This can be a range like `L123-L456` or `all`.",
+      "The lines of the source document to be shown. This can be a range like `L123-L456`. Only up to 4000 lines will be shown at a time.",
     ),
 });
 
@@ -233,7 +235,9 @@ export class KnowledgeStructuringSessionManager {
     // Create a new session
     const sessionData: SessionData = {
       ...pendingSession,
+      lastRequestedRange: null,
       sectionFilepaths,
+      remainingFilepaths: [...sectionFilepaths],
       completedFilepaths: [],
       commonPathPrefix,
     };
@@ -248,7 +252,6 @@ export class KnowledgeStructuringSessionManager {
       message: formatSessionStartResponse(
         sessionToken,
         sessionData.sectionFilepaths,
-        sessionData.sourceDocumentLines,
       ),
     };
   }
@@ -260,13 +263,26 @@ export class KnowledgeStructuringSessionManager {
     const { sessionToken, sourceDocumentRange } = params;
 
     // Check if session exists
-    const session = this.sessions.get(sessionToken);
+    const session =
+      this.sessions.get(sessionToken) ?? this.pendingSessions.get(sessionToken);
     if (!session) {
       return {
         isError: true,
         role: "assistant",
         message: "Error. Session does not exist or has already been finished.",
       };
+    }
+
+    if (sourceDocumentRange) {
+      if (sourceDocumentRange === session.lastRequestedRange) {
+        return {
+          isError: true,
+          role: "assistant",
+          message: `Error. You have requested the same range of the source document immediately before. Please request a different range.`,
+        };
+      }
+
+      session.lastRequestedRange = sourceDocumentRange;
     }
 
     // In a real implementation, we would filter the source document based on the range
@@ -290,6 +306,14 @@ export class KnowledgeStructuringSessionManager {
     // Check if session exists
     const session = this.sessions.get(sessionToken);
     if (!session) {
+      if (this.pendingSessions.has(sessionToken)) {
+        return {
+          isError: true,
+          role: "assistant",
+          message: "Error. Session is not started yet.",
+        };
+      }
+
       return {
         isError: true,
         role: "assistant",
@@ -306,7 +330,7 @@ export class KnowledgeStructuringSessionManager {
           message: formatErrorResponse(
             `The specified filepath ${JSON.stringify(filepath)} has already been completed.`,
             sessionToken,
-            session.sectionFilepaths,
+            session.remainingFilepaths,
             session.completedFilepaths,
           ),
         };
@@ -320,7 +344,7 @@ export class KnowledgeStructuringSessionManager {
           message: formatErrorResponse(
             `The specified filepath ${JSON.stringify(filepath)} is not part of the session.`,
             sessionToken,
-            session.sectionFilepaths,
+            session.remainingFilepaths,
             session.completedFilepaths,
           ),
         };
@@ -360,7 +384,7 @@ export class KnowledgeStructuringSessionManager {
     }
 
     // Calculate remaining filepaths
-    const remainingFilepaths = session.sectionFilepaths.filter(
+    session.remainingFilepaths = session.remainingFilepaths.filter(
       (fp) => !session.completedFilepaths.includes(fp),
     );
 
@@ -370,7 +394,7 @@ export class KnowledgeStructuringSessionManager {
       role: "assistant",
       message: formatWriteSectionsResponse(
         sessionToken,
-        remainingFilepaths,
+        session.remainingFilepaths,
         session.completedFilepaths,
         contentsToWrite,
       ),
@@ -386,6 +410,14 @@ export class KnowledgeStructuringSessionManager {
     // Check if session exists
     const session = this.sessions.get(sessionToken);
     if (!session) {
+      if (this.pendingSessions.has(sessionToken)) {
+        return {
+          isError: true,
+          role: "assistant",
+          message: "Error. Session is not started yet.",
+        };
+      }
+
       return {
         isError: true,
         role: "assistant",
@@ -405,7 +437,7 @@ export class KnowledgeStructuringSessionManager {
         message: formatErrorResponse(
           "The session cannot be ended because there are still sections to be completed.",
           sessionToken,
-          session.sectionFilepaths,
+          session.remainingFilepaths,
           session.completedFilepaths,
         ),
       };
@@ -455,6 +487,7 @@ export class KnowledgeStructuringSessionManager {
       sourceDocument,
       sourceDocumentLines,
       sourceDocumentLinesWithoutLineNumbers: sourceDocument.split("\n"),
+      lastRequestedRange: null,
       timestamp: Date.now(),
     });
 
