@@ -2,7 +2,11 @@
   "mcpServers": {
     "librarian": {
       "command": "node",
-      "args": ["dist/bin.js", "--docs-root", "examples/docs"],
+      "args": [
+        "dist/bin.js",
+        "--docs-root",
+        "examples/docs"
+      ],
       "disabled": false,
       "alwaysAllow": []
     }
