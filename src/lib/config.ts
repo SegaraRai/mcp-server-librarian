@@ -12,6 +12,8 @@ export interface LibrarianConfig {
    * Root directory for documentation files
    */
   docsRoot: string;
+
+  enableWriteOperations: boolean;
 }
 
 /**
@@ -25,6 +27,7 @@ export function getConfig(): LibrarianConfig {
   if (argIndex !== -1 && process.argv.length > argIndex + 1) {
     return {
       docsRoot: process.argv[argIndex + 1],
+      enableWriteOperations: true,
     };
   }
 
@@ -32,12 +35,14 @@ export function getConfig(): LibrarianConfig {
   if (process.env.LIBRARIAN_DOCS_ROOT) {
     return {
       docsRoot: process.env.LIBRARIAN_DOCS_ROOT,
+      enableWriteOperations: true,
     };
   }
 
   // Default to ./docs
   return {
     docsRoot: "./docs",
+    enableWriteOperations: true,
   };
 }
 

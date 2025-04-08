@@ -2,8 +2,8 @@
  * Core Librarian implementation
  */
 import { z } from "zod";
-import { KnowledgeStructuringSessionManager } from "./knowledgeStructuring/session.js";
 import { LibrarianConfig } from "./config.js";
+import { KnowledgeStructuringSessionManager } from "./knowledgeStructuring/session.js";
 import {
   Document,
   DocumentCache,
@@ -130,11 +130,17 @@ export class Librarian {
   private readonly config: LibrarianConfig;
   private documentCache: DocumentCache | null = null;
   private loading: Promise<DocumentCache> | null = null;
-  private knowledgeStructuringSessionManager: KnowledgeStructuringSessionManager;
+
+  readonly knowledgeStructuringSessionManager: KnowledgeStructuringSessionManager | null =
+    null;
 
   constructor(config: LibrarianConfig) {
     this.config = config;
-    this.knowledgeStructuringSessionManager = new KnowledgeStructuringSessionManager(config.docsRoot);
+
+    if (config.enableWriteOperations) {
+      this.knowledgeStructuringSessionManager =
+        new KnowledgeStructuringSessionManager(config.docsRoot);
+    }
   }
 
   /**
@@ -166,32 +172,17 @@ export class Librarian {
    * List documents with optional filtering by directory and tags
    */
   async listDocuments(params: ListDocumentsParams): Promise<Document[]> {
-    const { directory, tags, includeContents, depth } = params;
+    const { directory, tags, depth } = params;
     const cache = await this.ensureDocumentsLoaded();
 
-    const documents = filterDocuments(cache, directory, tags, depth);
-
-    // Remove contents if not requested
-    if (!includeContents) {
-      return documents.map(({ contents, ...rest }) => rest);
-    }
-
-    return documents;
+    return filterDocuments(cache, directory, tags, depth);
   }
 
   /**
    * Search documents using string or regex patterns
    */
   async searchDocuments(params: SearchDocumentsParams): Promise<Document[]> {
-    const {
-      query,
-      mode,
-      caseSensitive,
-      directory,
-      tags,
-      includeContents,
-      depth,
-    } = params;
+    const { query, mode, caseSensitive, directory, tags, depth } = params;
     const cache = await this.ensureDocumentsLoaded();
 
     return searchDocs(
@@ -199,7 +190,6 @@ export class Librarian {
       query,
       directory,
       tags,
-      includeContents,
       mode,
       caseSensitive,
       depth,
@@ -219,22 +209,13 @@ export class Librarian {
   /**
    * Get multiple documents by their paths
    */
-  async getDocuments(params: GetDocumentsParams): Promise<Document[]> {
+  async getDocuments(
+    params: GetDocumentsParams,
+  ): Promise<[string, Document | null][]> {
     const { filepaths } = params;
     const cache = await this.ensureDocumentsLoaded();
 
-    const documents = filepaths
-      .map((filepath) => {
-        try {
-          return getDoc(cache, filepath);
-        } catch (error) {
-          console.error(`Error retrieving document ${filepath}:`, error);
-          return null;
-        }
-      })
-      .filter((doc): doc is Document => doc !== null);
-
-    return documents;
+    return filepaths.map((filepath) => [filepath, getDoc(cache, filepath)]);
   }
 
   /**
@@ -247,12 +228,5 @@ export class Librarian {
     const cache = await this.ensureDocumentsLoaded();
 
     return getTagsInDirectory(cache, directory, includeFilepaths, depth);
-  }
-
-  /**
-   * Get the knowledge structuring session manager
-   */
-  getKnowledgeStructuringSessionManager(): KnowledgeStructuringSessionManager {
-    return this.knowledgeStructuringSessionManager;
   }
 }

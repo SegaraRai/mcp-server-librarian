@@ -2,38 +2,68 @@
  * Utility functions for formatting knowledge structuring session responses
  */
 
+function formatSessionStatus(
+  sessionToken: string,
+  remainingFiles: readonly string[],
+  completedFiles: readonly string[],
+): string {
+  const chunks = [`**Session Token:** \`${sessionToken}\``];
+
+  if (remainingFiles.length > 0) {
+    chunks.push(
+      `**Remaining File${remainingFiles.length !== 1 ? "s" : ""}:**\n${remainingFiles
+        .map((file) => `- ${file}`)
+        .join("\n")}`,
+    );
+  }
+
+  if (completedFiles.length > 0) {
+    chunks.push(
+      `**Completed File${completedFiles.length !== 1 ? "s" : ""}:**\n${completedFiles
+        .map((file) => `- ${file}`)
+        .join("\n")}`,
+    );
+  }
+
+  return chunks.join("\n\n");
+}
+
+function formatSourceDocument(sourceDocument: string, range?: string): string {
+  const match = range?.match(/^\D*(\d+)-\D*(\d+)/);
+  if (match) {
+    const lines = sourceDocument.split("\n");
+    const start = parseInt(match[1], 10) - 1;
+    const end = parseInt(match[2], 10);
+    const selectedLines = lines.slice(start, end).join("\n");
+    return `**Source Document (L${start}-L${end}):**\n======\n${selectedLines}`;
+  }
+
+  return `**Source Document:**\n======\n${sourceDocument}`;
+}
+
 /**
  * Format the response for starting a knowledge structuring session
  */
 export function formatSessionStartResponse(
   sessionToken: string,
   remainingFiles: string[],
-  sourceDocument: string
+  sourceDocument: string,
 ): string {
-  const formattedRemainingFiles = remainingFiles
-    .map((file) => `- ${file}`)
-    .join("\n");
+  return `OK. Call \`knowledgeStructuringSession.writeSection\` to write the structured files.
 
-  return `Accepted. Call \`knowledgeStructuringSession.writeSection\` to write the structured files.
+${formatSessionStatus(sessionToken, remainingFiles, [])}
 
-**Session Token:** \`${sessionToken}\`
-
-**Remaining Files:**
-
-${formattedRemainingFiles}
-
-**Source Document:**
-
-======
-
-${sourceDocument}`;
+${formatSourceDocument(sourceDocument)}`;
 }
 
 /**
  * Format the response for showing the source document
  */
-export function formatSourceDocumentResponse(sourceDocument: string): string {
-  return sourceDocument;
+export function formatSourceDocumentResponse(
+  sourceDocument: string,
+  range?: string,
+): string {
+  return formatSourceDocument(sourceDocument, range);
 }
 
 /**
@@ -41,86 +71,57 @@ export function formatSourceDocumentResponse(sourceDocument: string): string {
  */
 export function formatWriteSectionResponse(
   sessionToken: string,
-  remainingFiles: string[],
-  completedFiles: string[],
+  remainingFiles: readonly string[],
+  completedFiles: readonly string[],
   sourceDocument?: string,
-  isError: boolean = false,
-  errorMessage?: string
+  sourceDocumentRange?: string,
 ): string {
-  if (isError && errorMessage) {
-    return `Error. ${errorMessage}
+  const heading =
+    remainingFiles.length === 0
+      ? "OK. All files have been written. Call `knowledgeStructuringSession.end` to finish the session."
+      : "OK. Continue calling `knowledgeStructuringSession.writeSection` to write remaining files.";
 
-**Session Token:** \`${sessionToken}\`
+  return `${heading}
 
-**Remaining Files:**
+${formatSessionStatus(sessionToken, remainingFiles, completedFiles)}
 
-${remainingFiles.map((file) => `- ${file}`).join("\n")}
-
-**Completed Files:**
-
-${completedFiles.map((file) => `- ${file}`).join("\n")}`;
-  }
-
-  const status = remainingFiles.length === 0
-    ? "OK. Call `knowledgeStructuringSession.end` to finish the session."
-    : "OK. Continue calling `knowledgeStructuringSession.writeSection` to write remaining files.";
-
-  let response = `${status}
-
-**Session Token:** \`${sessionToken}\`
-
-**Remaining Files:**
-
-${remainingFiles.map((file) => `- ${file}`).join("\n")}
-
-**Completed Files:**
-
-${completedFiles.map((file) => `- ${file}`).join("\n")}`;
-
-  if (sourceDocument) {
-    response += `
-
-**Source Document:**
-
-======
-
-${sourceDocument}`;
-  }
-
-  return response;
+${sourceDocument ? formatSourceDocument(sourceDocument, sourceDocumentRange) : ""}`.trim();
 }
 
 /**
  * Format the response for ending a session
  */
 export function formatEndSessionResponse(
-  completedFiles: string[],
-  isError: boolean = false,
-  errorMessage?: string,
-  remainingFiles?: string[],
-  sessionToken?: string
+  completedFiles: readonly string[],
+  sessionToken: string,
+  commonPrefix: string,
+  documentName: string,
 ): string {
-  if (isError && errorMessage) {
-    if (remainingFiles && sessionToken) {
-      return `Error. ${errorMessage}
-
-**Session Token:** \`${sessionToken}\`
-
-**Remaining Files:**
-
-${remainingFiles.map((file) => `- ${file}`).join("\n")}
-
-**Completed Files:**
-
-${completedFiles.map((file) => `- ${file}`).join("\n")}`;
-    }
-    
-    return `Error. ${errorMessage}`;
-  }
+  const prefixWarning =
+    commonPrefix !== `/${documentName}/`
+      ? `Note that the files are written under "/${documentName}/" instead of "${commonPrefix}" based on the user request.`
+      : "";
 
   return `OK. The session is finished. The following files are written:
 
 ${completedFiles.map((file) => `- ${file}`).join("\n")}
 
-You can now use these files for your work. Call \`listDocuments\` with \`directory: "/foo/"\` to see the list of documents.`;
+The session "${sessionToken}" is now closed. Do not perform any further actions with it.
+
+You can now use these files for your work. Call \`listDocuments\` with \`directory: "/${documentName}/"\` to see the list of documents.
+${prefixWarning}`.trim();
+}
+
+export function formatErrorResponse(
+  error: string,
+  sessionToken: string,
+  remainingFiles: readonly string[],
+  completedFiles: readonly string[],
+  sourceDocument?: string,
+  sourceDocumentRange?: string,
+): string {
+  return `Error: ${error}
+${formatSessionStatus(sessionToken, remainingFiles, completedFiles)}
+
+${sourceDocument ? formatSourceDocument(sourceDocument, sourceDocumentRange) : ""}`.trim();
 }

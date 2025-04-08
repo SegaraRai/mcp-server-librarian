@@ -18,15 +18,18 @@ export function formatTags(tags: readonly string[]): string {
 /**
  * Format a list of documents as plaintext
  */
-export function formatDocumentList(documents: Document[]): string {
+export function formatDocumentList(
+  documents: [string, Document | null][],
+): string {
   if (documents.length === 0) {
     return "No documents found.";
   }
 
   return documents
-    .map((doc) => {
-      const filepath = normalizePath(doc.filepath);
-      return `- ${filepath}\n  - tags: ${formatTags(doc.tags)}`;
+    .map(([filepath, doc]) => {
+      return doc
+        ? `- ${filepath}\n  - tags: ${formatTags(doc.tags)}`
+        : `- ${filepath}\n  Document not found.`;
     })
     .join("\n");
 }
@@ -34,12 +37,18 @@ export function formatDocumentList(documents: Document[]): string {
 /**
  * Format a list of documents with contents as plaintext
  */
-export function formatDocumentListWithContents(documents: Document[]): string {
+export function formatDocumentListWithContents(
+  documents: [string, Document | null][],
+): string {
   if (documents.length === 0) {
     return "No documents found.";
   }
 
-  return documents.map((doc) => formatDocument(doc)).join("\n\n");
+  return documents
+    .map(([filepath, doc]) =>
+      doc ? formatDocument(doc) : `**${filepath}\n**Document not found.`,
+    )
+    .join("\n\n");
 }
 
 /**

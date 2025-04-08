@@ -24,7 +24,7 @@ export interface Document {
   /**
    * Document contents (markdown)
    */
-  contents?: string;
+  contents: string;
 }
 
 /**
@@ -33,7 +33,7 @@ export interface Document {
 interface RawDocument {
   filepath: string;
   tags: string[];
-  contents?: string;
+  contents: string;
 }
 
 /**
@@ -294,7 +294,6 @@ export function searchDocuments(
   query: string,
   directory: string = "/",
   tags: string[] = [],
-  includeContents: boolean = false,
   mode: "string" | "regex" = "string",
   caseSensitive: boolean = false,
   depth: number = -1,
@@ -327,11 +326,6 @@ export function searchDocuments(
     pattern.lastIndex = 0; // Reset regex index for each document
     return doc.contents != null && pattern.test(doc.contents);
   });
-
-  // Remove contents if not requested
-  if (!includeContents) {
-    return results.map(({ contents, ...rest }) => rest);
-  }
 
   return results;
 }
