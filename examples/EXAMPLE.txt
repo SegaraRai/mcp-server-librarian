@@ -1,7 +1,7 @@
-Please create a form in examples/AgeApp.tsx that allows users to enter and confirm their age.
+Please create a form in examples/AgeApp.tsx that allows users to enter and view their age.
 
 - The entered age is saved in LocalStorage and is not sent to the server.
-- Style using daisyUI.
-- Documentation on coding, such as style guides, can be obtained using the librarian tool.
+- Style using daisyUI. Never use classes or DOM structures not documented in daisyUI. They do not exist in daisyUI.
+- Documentation on coding, such as style guides, can be obtained using the librarian MCP server.
 - Page layout is not required, as it will be created as one of the elements within the page.
-- Referencing local files is prohibited. Only the use of tools is permitted.
+- **Referencing local files is prohibited. Only the use of MCP tools is permitted.**

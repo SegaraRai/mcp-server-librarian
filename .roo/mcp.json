@@ -8,7 +8,13 @@
         "examples/docs"
       ],
       "disabled": false,
-      "alwaysAllow": []
+      "alwaysAllow": [
+        "overview",
+        "listTags",
+        "getDocuments",
+        "searchDocuments",
+        "listDocuments"
+      ]
     }
   }
 }

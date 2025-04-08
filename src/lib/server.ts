@@ -21,6 +21,7 @@ import type { Document } from "./load.js";
 import {
   formatDocumentList,
   formatDocumentListWithContents,
+  formatOverview,
   formatTagList,
 } from "./util.js";
 
@@ -35,7 +36,7 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
     name: "Librarian",
     version: "1.0.0",
     description:
-      "A server for listing, searching, and retrieving documents curated exclusively for the project. If you want to know about project-specific knowledge or rules, you should first use the tools on this server to acquire the knowledge you need.",
+      "A server for listing, searching, and retrieving documents curated exclusively for the project. If you want to know about project-specific knowledge or rules, you should first use the `overview` tool on this server to acquire the knowledge you need.",
   });
 
   // Add listDocuments tool
@@ -119,7 +120,7 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
   // Add getDocuments tool
   server.tool(
     "getDocuments",
-    "Retrieves documents in the specified directory (defaults to the root dir), optionally filtering by tags and including contents.",
+    "Retrieves documents specified by their file paths. Since each document is small enough, please try to get as many documents as possible at once.",
     getDocumentsSchema.shape,
     async (args, extra) => {
       try {
@@ -178,6 +179,42 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
             {
               type: "text",
               text: `Failed to list tags: ${error.message || "Unknown error"}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    },
+  );
+
+  // Add overview tool
+  server.tool(
+    "overview",
+    "Returns a complete overview of all documents and tags in the library. You should first use this tool to see the structure of the library before using any other tools.",
+    {},
+    async (args, extra) => {
+      try {
+        // Always return all documents and tags regardless of parameters
+        const { documents, tags } = await librarian.getOverview();
+
+        // Format the overview
+        const formattedText = formatOverview(documents, tags);
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: formattedText,
+            },
+          ],
+        };
+      } catch (error: any) {
+        console.error("Error in overview:", error);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Failed to get overview: ${error.message || "Unknown error"}`,
             },
           ],
           isError: true,
@@ -297,10 +334,10 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
       },
     );
 
-    // Add knowledgeStructuringSession.writeSection tool
+    // Add knowledgeStructuringSession.writeSections tool
     server.tool(
-      "knowledgeStructuringSession.writeSection",
-      "Writes the extracted section to the file. Never use this tool unless you are explicitly instructed to do so in the previous tool response, as it requires a pre-generated session token.",
+      "knowledgeStructuringSession.writeSections",
+      "Writes the extracted section to the file. Never use this tool unless you are explicitly instructed to do so in the previous tool response, as it requires a pre-generated session token. Please specify as many sections (up to 25) as possible at once.",
       writeSectionsSchema.shape,
       async (args, extra) => {
         try {
@@ -320,7 +357,7 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
           };
         } catch (error: any) {
           console.error(
-            "Error in knowledgeStructuringSession.writeSection:",
+            "Error in knowledgeStructuringSession.writeSections:",
             error,
           );
           return {

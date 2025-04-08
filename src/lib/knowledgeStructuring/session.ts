@@ -1,8 +1,8 @@
 /**
  * Knowledge Structuring Session Manager
  */
-import * as fsp from "node:fs/promises";
-import * as path from "node:path";
+import fs, { promises as fsp } from "node:fs";
+import path from "node:path";
 import { z } from "zod";
 import { Answer } from "../answer.js";
 import { normalizePath } from "../normalize.js";
@@ -133,7 +133,7 @@ export const writeSectionsSchema = z.object({
       }),
     )
     .describe(
-      "The sections to be written. You can specify up to 10 items at a time.",
+      "The sections to be written. You can specify up to 25 items at a time.",
     ),
 });
 
@@ -437,6 +437,11 @@ export class KnowledgeStructuringSessionManager {
 
     // Generate a session token
     const sessionToken = crypto.randomUUID();
+
+    // Check if the document already exists
+    if (fs.existsSync(`${this.docsRoot}/${documentName}`)) {
+      return `Error. The document ${documentName} already exists.`;
+    }
 
     // In a real implementation, we would load the source document from documentSource
     const sourceDocument = await fetchSourceDocument(documentSource);

@@ -2,16 +2,7 @@
  * Utility functions for formatting knowledge structuring session responses
  */
 
-function withLineNumber(text: string, indent = ""): string {
-  const lines = text.split("\n");
-  const lineNumberWidth = String(lines.length).length;
-  return lines
-    .map(
-      (line, index) =>
-        `${indent}${String(index + 1).padStart(lineNumberWidth, " ")} | ${line}`,
-    )
-    .join("\n");
-}
+import { withLineNumber } from "../util.js";
 
 function formatSessionStatus(
   sessionToken: string,

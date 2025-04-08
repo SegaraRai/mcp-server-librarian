@@ -1,4 +1,4 @@
-import * as path from "node:path";
+import path from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
 import {
   DocumentCache,
@@ -189,7 +189,15 @@ describe("searchDocuments", () => {
     };
 
     // Call searchDocuments with includeContents=true to keep contents
-    const results = searchDocuments(mockDocCache, "search term", "/", [], "string", false, -1);
+    const results = searchDocuments(
+      mockDocCache,
+      "search term",
+      "/",
+      [],
+      "string",
+      false,
+      -1,
+    );
 
     // Verify we got a result
     expect(results.length).toBe(1);
@@ -220,7 +228,7 @@ describe("searchDocuments", () => {
       [],
       "regex",
       false,
-      -1
+      -1,
     );
 
     // Verify we got a result
@@ -248,7 +256,15 @@ describe("searchDocuments", () => {
   });
 
   it("should include contents when requested", () => {
-    const results = searchDocuments(documentCache, "button", "/", [], "string", false, -1);
+    const results = searchDocuments(
+      documentCache,
+      "button",
+      "/",
+      [],
+      "string",
+      false,
+      -1,
+    );
 
     // All results should have contents
     for (const doc of results) {
@@ -257,7 +273,15 @@ describe("searchDocuments", () => {
   });
 
   it("should include contents regardless of includeContents parameter", () => {
-    const results = searchDocuments(documentCache, "button", "/", [], "string", false, -1);
+    const results = searchDocuments(
+      documentCache,
+      "button",
+      "/",
+      [],
+      "string",
+      false,
+      -1,
+    );
 
     // All results should have contents since the implementation doesn't remove them
     for (const doc of results) {

@@ -4,6 +4,17 @@
 import { Document } from "./load.js";
 import { normalizePath } from "./normalize.js";
 
+export function withLineNumber(text: string, indent = ""): string {
+  const lines = text.split("\n");
+  const lineNumberWidth = String(lines.length).length;
+  return lines
+    .map(
+      (line, index) =>
+        `${indent}${String(index + 1).padStart(lineNumberWidth, " ")} | ${line}`,
+    )
+    .join("\n");
+}
+
 /**
  * Format a list of tags as plaintext
  */
@@ -46,7 +57,7 @@ export function formatDocumentListWithContents(
 
   return documents
     .map(([filepath, doc]) =>
-      doc ? formatDocument(doc) : `**${filepath}\n**Document not found.`,
+      doc ? formatDocument(doc) : `- ${filepath}\n  Document not found.`,
     )
     .join("\n\n");
 }
@@ -56,7 +67,7 @@ export function formatDocumentListWithContents(
  */
 export function formatDocument(document: Document): string {
   const filepath = normalizePath(document.filepath);
-  return `**${filepath}**\n- tags: ${formatTags(document.tags)}\n======\n${document.contents ?? ""}\n======`;
+  return `- ${filepath}\n  - tags: ${formatTags(document.tags)}\n${withLineNumber(document.contents, "  ")}`;
 }
 
 /**
@@ -83,4 +94,23 @@ export function formatTagList(
       return result;
     })
     .join("\n");
+}
+
+/**
+ * Format an overview of documents and tags as plaintext
+ */
+export function formatOverview(
+  documents: Document[],
+  tags: { tag: string; count: number; filepaths?: string[] }[],
+): string {
+  const documentsSection =
+    documents.length === 0
+      ? "No documents found."
+      : documents
+          .map((doc) => `- ${doc.filepath}\n  - tags: ${formatTags(doc.tags)}`)
+          .join("\n");
+
+  const tagsSection = formatTagList(tags);
+
+  return `# Documents\n\n${documentsSection}\n\n# Tags\n\n${tagsSection}`;
 }

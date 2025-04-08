@@ -1,4 +1,4 @@
-import * as fs from "node:fs";
+import fs from "node:fs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { checkDocsRootExists, getConfig, LibrarianConfig } from "./config.js";
 
@@ -64,7 +64,10 @@ describe("checkDocsRootExists", () => {
     // Mock fs.existsSync to return true
     vi.mocked(fs.existsSync).mockReturnValue(true);
 
-    const config: LibrarianConfig = { docsRoot: "/existing/path", enableWriteOperations: true };
+    const config: LibrarianConfig = {
+      docsRoot: "/existing/path",
+      enableWriteOperations: true,
+    };
     expect(() => checkDocsRootExists(config)).not.toThrow();
 
     // Verify existsSync was called
@@ -75,7 +78,10 @@ describe("checkDocsRootExists", () => {
     // Mock fs.existsSync to return false
     vi.mocked(fs.existsSync).mockReturnValue(false);
 
-    const config: LibrarianConfig = { docsRoot: "/non-existing/path", enableWriteOperations: true };
+    const config: LibrarianConfig = {
+      docsRoot: "/non-existing/path",
+      enableWriteOperations: true,
+    };
     expect(() => checkDocsRootExists(config)).toThrow();
 
     // Verify existsSync was called

@@ -46,7 +46,9 @@ export const searchDocumentsSchema = z.object({
   mode: z
     .enum(["string", "regex"])
     .default("string")
-    .describe("Search mode (string or regex)"),
+    .describe(
+      "Search mode (string or regex). The string mode does not support OR/AND/NOT operators. To search for multiple words, use regex mode.",
+    ),
   caseSensitive: z
     .boolean()
     .default(false)
@@ -228,5 +230,20 @@ export class Librarian {
     const cache = await this.ensureDocumentsLoaded();
 
     return getTagsInDirectory(cache, directory, includeFilepaths, depth);
+  }
+
+  /**
+   * Get an overview of all documents and tags
+   */
+  async getOverview(): Promise<{
+    documents: Document[];
+    tags: { tag: string; count: number; filepaths?: string[] }[];
+  }> {
+    const cache = await this.ensureDocumentsLoaded();
+
+    const documents = filterDocuments(cache, "/", [], -1);
+    const tags = getTagsInDirectory(cache, "/", false, -1);
+
+    return { documents, tags };
   }
 }

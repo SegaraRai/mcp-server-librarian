@@ -1,8 +1,8 @@
 /**
  * Configuration module for the Librarian MCP server
  */
-import * as fs from "node:fs";
-import * as process from "node:process";
+import fs from "node:fs";
+import process from "node:process";
 
 /**
  * Configuration options for the Librarian
