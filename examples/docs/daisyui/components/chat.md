@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "chat", "message"]
+tags: ["daisyui", "components", "chat", "bubble", "layout", "avatar", "colors"]
 source: "https://daisyui.com/llms.txt"
 ---
 

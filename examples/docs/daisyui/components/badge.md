@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "badge", "label"]
+tags: ["daisyui", "components", "badge", "status", "styling", "colors", "size"]
 source: "https://daisyui.com/llms.txt"
 ---
 

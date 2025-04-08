@@ -1,8 +1,10 @@
 ---
-tags: ["daisyui", "components", "toggle", "switch"]
+tags: ["daisyui", "components", "toggle", "switch", "checkbox", "form", "input", "styling", "colors", "size"]
 source: "https://daisyui.com/llms.txt"
 ---
 
+### toggle
+Toggle is a checkbox that is styled to look like a switch button
 
 [toggle docs](https://daisyui.com/components/toggle/)
 

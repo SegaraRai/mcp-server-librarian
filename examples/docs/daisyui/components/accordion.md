@@ -1,9 +1,7 @@
 ---
-tags: ["daisyui", "components", "accordion", "collapse"]
+tags: ["daisyui", "components", "accordion", "collapse", "radio-input"]
 source: "https://daisyui.com/llms.txt"
 ---
-
-## daisyUI 5 components
 
 ### accordion
 Accordion is used for showing and hiding content but only one item can stay open at a time

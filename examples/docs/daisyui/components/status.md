@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "status", "indicator"]
+tags: ["daisyui", "components", "status", "indicator", "icon", "styling", "colors", "size"]
 source: "https://daisyui.com/llms.txt"
 ---
 

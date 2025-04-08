@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "loading", "spinner"]
+tags: ["daisyui", "components", "loading", "spinner", "animation", "styling", "size"]
 source: "https://daisyui.com/llms.txt"
 ---
 

@@ -1,8 +1,9 @@
 ---
-tags: ["daisyui", "components", "stat", "data"]
+tags: ["daisyui", "components", "stat", "statistics", "data", "layout", "styling"]
 source: "https://daisyui.com/llms.txt"
 ---
 
+### stat
 Stat is used to show numbers and data in a block
 
 [stat docs](https://daisyui.com/components/stat/)

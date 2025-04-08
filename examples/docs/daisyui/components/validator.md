@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "validator", "form"]
+tags: ["daisyui", "components", "validator", "form", "validation", "input", "select", "textarea", "styling"]
 source: "https://daisyui.com/llms.txt"
 ---
 
@@ -17,3 +17,6 @@ Validator class changes the color of form elements to error or success based on 
 <input type="{type}" class="input validator" required />
 <p class="validator-hint">Error message</p>
 ```
+
+#### Rules
+- Use with `input`, `select`, `textarea`

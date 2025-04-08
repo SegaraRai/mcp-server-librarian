@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "dropdown", "menu"]
+tags: ["daisyui", "components", "dropdown", "menu", "popover", "details", "summary", "css-focus"]
 source: "https://daisyui.com/llms.txt"
 ---
 

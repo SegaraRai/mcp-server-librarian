@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "mockup", "browser"]
+tags: ["daisyui", "components", "mockup", "browser", "window", "styling"]
 source: "https://daisyui.com/llms.txt"
 ---
 

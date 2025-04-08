@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "file-input", "form"]
+tags: ["daisyui", "components", "file-input", "form", "upload", "styling", "colors", "size"]
 source: "https://daisyui.com/llms.txt"
 ---
 

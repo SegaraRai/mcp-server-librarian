@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "range", "slider"]
+tags: ["daisyui", "components", "range", "slider", "form", "input", "styling", "colors", "size"]
 source: "https://daisyui.com/llms.txt"
 ---
 

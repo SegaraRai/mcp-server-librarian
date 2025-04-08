@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "pagination", "navigation"]
+tags: ["daisyui", "components", "pagination", "navigation", "button-group", "join"]
 source: "https://daisyui.com/llms.txt"
 ---
 

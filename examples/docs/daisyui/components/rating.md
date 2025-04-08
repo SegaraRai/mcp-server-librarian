@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "rating", "stars"]
+tags: ["daisyui", "components", "rating", "stars", "form", "radio", "mask", "styling", "size"]
 source: "https://daisyui.com/llms.txt"
 ---
 

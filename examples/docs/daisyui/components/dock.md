@@ -1,8 +1,9 @@
 ---
-tags: ["daisyui", "components", "dock", "navigation"]
+tags: ["daisyui", "components", "dock", "bottom-navigation", "mobile", "ios", "button", "size"]
 source: "https://daisyui.com/llms.txt"
 ---
 
+### dock
 Dock (also know as Bottom navigation or Bottom bar) is a UI element that provides navigation options to the user. Dock sticks to the bottom of the screen
 
 [dock docs](https://daisyui.com/components/dock/)

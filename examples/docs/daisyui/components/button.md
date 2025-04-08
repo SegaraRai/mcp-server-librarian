@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "button", "action"]
+tags: ["daisyui", "components", "button", "styling", "behavior", "accessibility", "colors", "size"]
 source: "https://daisyui.com/llms.txt"
 ---
 

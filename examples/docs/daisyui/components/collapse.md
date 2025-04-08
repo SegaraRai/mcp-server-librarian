@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "collapse", "toggle"]
+tags: ["daisyui", "components", "collapse", "details", "summary", "checkbox", "accordion"]
 source: "https://daisyui.com/llms.txt"
 ---
 

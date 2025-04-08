@@ -1,8 +1,9 @@
 ---
-tags: ["daisyui", "components", "modal", "dialog"]
+tags: ["daisyui", "components", "modal", "dialog", "popup", "html-dialog", "checkbox", "anchor-link", "accessibility"]
 source: "https://daisyui.com/llms.txt"
 ---
 
+### modal
 Modal is used to show a dialog or a box when you click a button
 
 [modal docs](https://daisyui.com/components/modal/)

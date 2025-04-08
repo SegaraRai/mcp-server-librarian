@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "configuration", "themes", "setup"]
+tags: ["daisyui", "configuration", "themes", "css-plugin", "prefix", "logs"]
 source: "https://daisyui.com/llms.txt"
 ---
 

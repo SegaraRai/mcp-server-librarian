@@ -1,8 +1,9 @@
 ---
-tags: ["daisyui", "components", "list", "layout"]
+tags: ["daisyui", "components", "list", "layout", "vertical-list", "row", "column"]
 source: "https://daisyui.com/llms.txt"
 ---
 
+### list
 List is a vertical layout to display information in rows
 
 [list docs](https://daisyui.com/components/list/)

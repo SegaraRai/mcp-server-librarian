@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "join", "group"]
+tags: ["daisyui", "components", "join", "grouping", "button-group", "input-group", "layout", "responsive"]
 source: "https://daisyui.com/llms.txt"
 ---
 

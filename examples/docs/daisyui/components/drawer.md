@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "drawer", "sidebar"]
+tags: ["daisyui", "components", "drawer", "sidebar", "layout", "responsive", "checkbox"]
 source: "https://daisyui.com/llms.txt"
 ---
 

@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "timeline", "events"]
+tags: ["daisyui", "components", "timeline", "events", "chronological", "layout", "styling"]
 source: "https://daisyui.com/llms.txt"
 ---
 

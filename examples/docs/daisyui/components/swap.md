@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "swap", "toggle"]
+tags: ["daisyui", "components", "swap", "toggle", "checkbox", "javascript", "styling", "animation"]
 source: "https://daisyui.com/llms.txt"
 ---
 

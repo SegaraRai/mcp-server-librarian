@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "mockup", "phone"]
+tags: ["daisyui", "components", "mockup", "phone", "iphone", "styling"]
 source: "https://daisyui.com/llms.txt"
 ---
 

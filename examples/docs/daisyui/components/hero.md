@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "hero", "banner"]
+tags: ["daisyui", "components", "hero", "layout", "image", "overlay", "content"]
 source: "https://daisyui.com/llms.txt"
 ---
 

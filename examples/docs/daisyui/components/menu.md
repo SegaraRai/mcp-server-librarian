@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "menu", "navigation"]
+tags: ["daisyui", "components", "menu", "navigation", "list", "dropdown", "responsive", "styling", "size"]
 source: "https://daisyui.com/llms.txt"
 ---
 

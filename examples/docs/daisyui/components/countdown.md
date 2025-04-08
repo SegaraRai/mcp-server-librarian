@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "countdown", "timer"]
+tags: ["daisyui", "components", "countdown", "timer", "javascript", "css-variables", "accessibility"]
 source: "https://daisyui.com/llms.txt"
 ---
 

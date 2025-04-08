@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "steps", "progress"]
+tags: ["daisyui", "components", "steps", "progress", "navigation", "styling", "colors", "layout"]
 source: "https://daisyui.com/llms.txt"
 ---
 

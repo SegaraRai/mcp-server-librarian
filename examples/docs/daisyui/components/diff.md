@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "diff", "comparison"]
+tags: ["daisyui", "components", "diff", "comparison", "image", "aspect-ratio", "slider"]
 source: "https://daisyui.com/llms.txt"
 ---
 

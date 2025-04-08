@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "kbd", "keyboard"]
+tags: ["daisyui", "components", "kbd", "keyboard-shortcut", "styling", "size"]
 source: "https://daisyui.com/llms.txt"
 ---
 

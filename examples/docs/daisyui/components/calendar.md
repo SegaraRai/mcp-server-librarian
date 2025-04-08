@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "calendar", "date-picker"]
+tags: ["daisyui", "components", "calendar", "cally", "pikaday", "react-day-picker", "integration"]
 source: "https://daisyui.com/llms.txt"
 ---
 

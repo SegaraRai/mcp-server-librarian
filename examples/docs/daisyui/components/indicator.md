@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "indicator", "badge"]
+tags: ["daisyui", "components", "indicator", "badge", "positioning", "layout"]
 source: "https://daisyui.com/llms.txt"
 ---
 

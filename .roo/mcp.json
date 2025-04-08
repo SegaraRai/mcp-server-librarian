@@ -13,7 +13,9 @@
         "listTags",
         "getDocuments",
         "searchDocuments",
-        "listDocuments"
+        "listDocuments",
+        "knowledgeStructuringSession.showSourceDocument",
+        "knowledgeStructuringSession.writeSections"
       ]
     }
   }

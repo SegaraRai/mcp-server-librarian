@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "theme-controller", "theming"]
+tags: ["daisyui", "components", "theme-controller", "theming", "checkbox", "radio", "javascript"]
 source: "https://daisyui.com/llms.txt"
 ---
 

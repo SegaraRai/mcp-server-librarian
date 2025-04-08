@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "fieldset", "form"]
+tags: ["daisyui", "components", "fieldset", "form", "grouping", "legend", "label"]
 source: "https://daisyui.com/llms.txt"
 ---
 

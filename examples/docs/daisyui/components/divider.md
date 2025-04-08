@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "divider", "separator"]
+tags: ["daisyui", "components", "divider", "separator", "layout", "colors"]
 source: "https://daisyui.com/llms.txt"
 ---
 
@@ -22,5 +22,3 @@ Divider will be used to separate content vertically or horizontally
 #### Rules
 - {MODIFIER} is optional and can have one of each direction/color/placement class names
 - Omit text for a blank divider
-
-### dock

@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "introduction", "overview"]
+tags: ["daisyui", "introduction"]
 source: "https://daisyui.com/llms.txt"
 ---
 

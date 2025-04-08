@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "breadcrumbs", "navigation"]
+tags: ["daisyui", "components", "breadcrumbs", "navigation", "links"]
 source: "https://daisyui.com/llms.txt"
 ---
 

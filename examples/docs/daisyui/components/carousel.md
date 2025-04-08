@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "carousel", "slider"]
+tags: ["daisyui", "components", "carousel", "slider", "layout", "scroll"]
 source: "https://daisyui.com/llms.txt"
 ---
 

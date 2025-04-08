@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "usage", "guidelines", "best-practices"]
+tags: ["daisyui", "usage", "rules", "tailwind-css", "customization", "class-names", "layout"]
 source: "https://daisyui.com/llms.txt"
 ---
 
@@ -14,3 +14,14 @@ source: "https://daisyui.com/llms.txt"
 8. suggested - if you need placeholder images, use https://picsum.photos/200/300 with the size you want
 9. suggested - when designing , don't add a custom font unless it's necessary
 10. don't add `bg-base-100 text-base-content` to body unless it's necessary
+
+daisyUI 5 class names are one of the following categories. these type names are only for reference and are not used in the actual code
+- `component`: the required component class
+- `part`: a child part of a component
+- `style`: sets a specific style to component or part
+- `behavior`: changes the behavior of component or part
+- `color`: sets a specific color to component or part
+- `size`: sets a specific size to component or part
+- `placement`: sets a specific placement to component or part
+- `direction`: sets a specific direction to component or part
+- `modifier`: modifies the component or part in a specific way

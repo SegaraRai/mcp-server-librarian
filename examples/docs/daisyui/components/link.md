@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "link", "anchor"]
+tags: ["daisyui", "components", "link", "anchor", "styling", "colors", "hover"]
 source: "https://daisyui.com/llms.txt"
 ---
 
@@ -20,5 +20,3 @@ Link adds the missing underline style to links
 
 #### Rules
 - {MODIFIER} is optional and can have one of the modifier class names
-
-### list

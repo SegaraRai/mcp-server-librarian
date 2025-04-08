@@ -1,8 +1,7 @@
 ---
-tags: ["daisyui", "components", "tab", "navigation"]
+tags: ["daisyui", "components", "tab", "navigation", "button", "radio", "styling", "layout"]
 source: "https://daisyui.com/llms.txt"
 ---
-
 
 ### tab
 Tabs can be used to show a list of links in a tabbed format

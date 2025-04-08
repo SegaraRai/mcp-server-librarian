@@ -1,0 +1,10 @@
+Please create an API server using hono in examples/honoServer.ts that allows users to enter and view their age.
+
+- Store the entered age in JSON files.
+- The server should have two endpoints:
+  - `POST /users/:username/age`: Accepts a JSON object with the user's age and saves it to a file.
+  - `GET /users/:username/age`: Returns the saved age in JSON format.
+- The server should handle errors gracefully and return appropriate HTTP status codes.
+- Use the `node:fs/promises` module to read and write files.
+- Documentation on coding, such as style guides, can be obtained using the librarian MCP server.
+- **Referencing local files is prohibited for coding. Only the use of MCP tools is permitted.**

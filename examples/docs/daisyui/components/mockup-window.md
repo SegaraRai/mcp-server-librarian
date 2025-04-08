@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "mockup", "window"]
+tags: ["daisyui", "components", "mockup", "window", "os-window", "styling"]
 source: "https://daisyui.com/llms.txt"
 ---
 
@@ -17,5 +17,3 @@ Window mockup shows a box that looks like an operating system window
   <div>{CONTENT}</div>
 </div>
 ```
-
-### modal

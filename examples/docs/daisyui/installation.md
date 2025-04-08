@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "installation", "setup", "tailwind"]
+tags: ["daisyui", "installation", "tailwind-css", "cdn", "node"]
 source: "https://daisyui.com/llms.txt"
 ---
 

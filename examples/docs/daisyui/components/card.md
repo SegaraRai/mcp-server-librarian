@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "card", "container"]
+tags: ["daisyui", "components", "card", "layout", "image", "styling", "responsive"]
 source: "https://daisyui.com/llms.txt"
 ---
 

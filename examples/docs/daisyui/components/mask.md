@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "mask", "shape"]
+tags: ["daisyui", "components", "mask", "image", "shape", "clipping", "styling"]
 source: "https://daisyui.com/llms.txt"
 ---
 

@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "mockup", "code"]
+tags: ["daisyui", "components", "mockup", "code", "pre", "syntax-highlighting", "styling"]
 source: "https://daisyui.com/llms.txt"
 ---
 

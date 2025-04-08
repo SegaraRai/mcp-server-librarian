@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "radial-progress", "loading"]
+tags: ["daisyui", "components", "radial-progress", "progress", "circle", "css-variables", "accessibility", "styling"]
 source: "https://daisyui.com/llms.txt"
 ---
 

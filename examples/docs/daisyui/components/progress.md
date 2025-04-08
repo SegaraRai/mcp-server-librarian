@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "progress", "loading"]
+tags: ["daisyui", "components", "progress", "progress-bar", "loading", "styling", "colors"]
 source: "https://daisyui.com/llms.txt"
 ---
 

@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "checkbox", "form"]
+tags: ["daisyui", "components", "checkbox", "form", "input", "colors", "size"]
 source: "https://daisyui.com/llms.txt"
 ---
 

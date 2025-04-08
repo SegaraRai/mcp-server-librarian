@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "alert", "notification"]
+tags: ["daisyui", "components", "alert", "notification", "styling", "colors", "layout"]
 source: "https://daisyui.com/llms.txt"
 ---
 
@@ -22,5 +22,3 @@ Alert informs users about important events
 #### Rules
 - {MODIFIER} is optional and can have one of each style/color/direction class names
 - Add `sm:alert-horizontal` for responsive layouts
-
-### avatar

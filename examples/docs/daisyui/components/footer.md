@@ -1,8 +1,7 @@
 ---
-tags: ["daisyui", "components", "footer", "layout"]
+tags: ["daisyui", "components", "footer", "layout", "navigation", "responsive"]
 source: "https://daisyui.com/llms.txt"
 ---
-
 
 ### footer
 Footer can contain logo, copyright notice, and links to other pages

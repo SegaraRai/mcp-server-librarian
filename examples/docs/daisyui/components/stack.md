@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "stack", "layout"]
+tags: ["daisyui", "components", "stack", "layout", "overlap", "positioning"]
 source: "https://daisyui.com/llms.txt"
 ---
 
@@ -20,5 +20,3 @@ Stack visually puts elements on top of each other
 #### Rules
 - {MODIFIER} is optional and can have one of the modifier class names
 - You can use `w-*` and `h-*` classes to set the width and height of the stack, making all items the same size
-
-### stat

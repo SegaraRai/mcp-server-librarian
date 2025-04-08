@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "label", "form"]
+tags: ["daisyui", "components", "label", "form", "input", "floating-label"]
 source: "https://daisyui.com/llms.txt"
 ---
 

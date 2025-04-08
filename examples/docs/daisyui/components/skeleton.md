@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "skeleton", "loading"]
+tags: ["daisyui", "components", "skeleton", "loading", "placeholder", "styling"]
 source: "https://daisyui.com/llms.txt"
 ---
 

@@ -1,8 +1,9 @@
 ---
-tags: ["daisyui", "components", "avatar", "profile-image"]
+tags: ["daisyui", "components", "avatar", "image", "placeholder", "mask", "status"]
 source: "https://daisyui.com/llms.txt"
 ---
 
+### avatar
 Avatars are used to show a thumbnail
 
 [avatar docs](https://daisyui.com/components/avatar/)

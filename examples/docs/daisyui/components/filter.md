@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "filter", "selection"]
+tags: ["daisyui", "components", "filter", "radio-button", "form", "reset", "button"]
 source: "https://daisyui.com/llms.txt"
 ---
 

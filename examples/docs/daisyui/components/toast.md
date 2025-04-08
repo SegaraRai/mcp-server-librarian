@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "toast", "notification"]
+tags: ["daisyui", "components", "toast", "notification", "popup", "layout", "positioning"]
 source: "https://daisyui.com/llms.txt"
 ---
 
@@ -19,6 +19,3 @@ Toast is a wrapper to stack elements, positioned on the corner of page
 
 #### Rules
 - {MODIFIER} is optional and can have one of the placement class names
-
-### toggle
-Toggle is a checkbox that is styled to look like a switch button

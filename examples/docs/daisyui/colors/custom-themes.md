@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "theming", "custom-theme", "colors"]
+tags: ["daisyui", "colors", "custom-themes", "theme-generator", "css-variables", "oklch"]
 source: "https://daisyui.com/llms.txt"
 ---
 

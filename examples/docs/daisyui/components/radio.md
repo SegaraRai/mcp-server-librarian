@@ -1,5 +1,5 @@
 ---
-tags: ["daisyui", "components", "radio", "form"]
+tags: ["daisyui", "components", "radio", "form", "input", "styling", "colors", "size"]
 source: "https://daisyui.com/llms.txt"
 ---
 
