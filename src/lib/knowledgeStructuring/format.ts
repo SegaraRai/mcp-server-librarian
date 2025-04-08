@@ -28,17 +28,40 @@ function formatSessionStatus(
   return chunks.join("\n\n");
 }
 
-function formatSourceDocument(sourceDocument: string, range?: string): string {
+function formatSourceDocument(
+  sourceDocumentLines: readonly string[],
+  range?: string,
+): string {
   const match = range?.match(/^\D*(\d+)-\D*(\d+)/);
   if (match) {
-    const lines = sourceDocument.split("\n");
     const start = parseInt(match[1], 10) - 1;
     const end = parseInt(match[2], 10);
-    const selectedLines = lines.slice(start, end).join("\n");
+    const selectedLines = sourceDocumentLines.slice(start, end).join("\n");
     return `**Source Document (L${start}-L${end}):**\n======\n${selectedLines}`;
   }
 
-  return `**Source Document:**\n======\n${sourceDocument}`;
+  return `**Source Document:**\n======\n${sourceDocumentLines.join("\n")}`;
+}
+
+export function formatInitialPrompt(
+  sessionToken: string,
+  sourceDocumentLines: readonly string[],
+): string {
+  return `You are an outstanding editor, well-versed in computer science and IT, and you are good at analyzing, classifying, and structuring documents.
+Our ultimate goal is to break down a large document into sections, tag and organize them into a hierarchy of markdown files in a file tree.
+
+To get started, let's understand the outline of the document.
+Please focus on analyzing the structure of the document.
+
+1. Read the document below (Source Document) thoroughly and understand its structure.
+2. Identify the sections and subsections of the document and consider the filepath in lower-kebab-case for each. (e.g. \`/path/to/dir/getting-started.md\`).
+3. Call \`knowledgeStructuringSession.start\` with the following session token and the filepaths you considered."
+
+**Session Token:** \`${sessionToken}\`
+
+**Source Document:**
+======
+${sourceDocumentLines.join("\n")}`;
 }
 
 /**
@@ -46,24 +69,24 @@ function formatSourceDocument(sourceDocument: string, range?: string): string {
  */
 export function formatSessionStartResponse(
   sessionToken: string,
-  remainingFiles: string[],
-  sourceDocument: string,
+  remainingFiles: readonly string[],
+  sourceDocumentLines: readonly string[],
 ): string {
   return `OK. Call \`knowledgeStructuringSession.writeSection\` to write the structured files.
 
 ${formatSessionStatus(sessionToken, remainingFiles, [])}
 
-${formatSourceDocument(sourceDocument)}`;
+${formatSourceDocument(sourceDocumentLines)}`;
 }
 
 /**
  * Format the response for showing the source document
  */
 export function formatSourceDocumentResponse(
-  sourceDocument: string,
+  sourceDocumentLines: readonly string[],
   range?: string,
 ): string {
-  return formatSourceDocument(sourceDocument, range);
+  return formatSourceDocument(sourceDocumentLines, range);
 }
 
 /**
@@ -73,7 +96,7 @@ export function formatWriteSectionResponse(
   sessionToken: string,
   remainingFiles: readonly string[],
   completedFiles: readonly string[],
-  sourceDocument?: string,
+  sourceDocumentLines?: readonly string[],
   sourceDocumentRange?: string,
 ): string {
   const heading =
@@ -85,7 +108,7 @@ export function formatWriteSectionResponse(
 
 ${formatSessionStatus(sessionToken, remainingFiles, completedFiles)}
 
-${sourceDocument ? formatSourceDocument(sourceDocument, sourceDocumentRange) : ""}`.trim();
+${sourceDocumentLines ? formatSourceDocument(sourceDocumentLines, sourceDocumentRange) : ""}`.trim();
 }
 
 /**
@@ -117,11 +140,11 @@ export function formatErrorResponse(
   sessionToken: string,
   remainingFiles: readonly string[],
   completedFiles: readonly string[],
-  sourceDocument?: string,
+  sourceDocumentLines?: readonly string[],
   sourceDocumentRange?: string,
 ): string {
   return `Error: ${error}
 ${formatSessionStatus(sessionToken, remainingFiles, completedFiles)}
 
-${sourceDocument ? formatSourceDocument(sourceDocument, sourceDocumentRange) : ""}`.trim();
+${sourceDocumentLines ? formatSourceDocument(sourceDocumentLines, sourceDocumentRange) : ""}`.trim();
 }

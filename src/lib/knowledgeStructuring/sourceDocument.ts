@@ -22,5 +22,14 @@ export async function fetchSourceDocument(source: string): Promise<string> {
     throw new Error("Source document is empty.");
   }
 
-  return text;
+  return text.trim();
+}
+
+export function sourceDocumentToLines(sourceDocument: string): string[] {
+  const lines = sourceDocument.split("\n");
+  const lineNumberWidth = String(lines.length).length;
+  return lines.map(
+    (line, index) =>
+      `${String(index + 1).padStart(lineNumberWidth, " ")} | ${line}`,
+  );
 }

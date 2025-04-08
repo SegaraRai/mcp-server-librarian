@@ -5,14 +5,18 @@ import * as fsp from "node:fs/promises";
 import { z } from "zod";
 import { Answer } from "../answer.js";
 import { normalizePath } from "../normalize.js";
-import { fetchSourceDocument } from "./fetchSourceDocument.js";
 import {
   formatEndSessionResponse,
   formatErrorResponse,
+  formatInitialPrompt,
   formatSessionStartResponse,
   formatSourceDocumentResponse,
   formatWriteSectionResponse,
 } from "./format.js";
+import {
+  fetchSourceDocument,
+  sourceDocumentToLines,
+} from "./sourceDocument.js";
 
 /**
  * Session data structure
@@ -21,6 +25,7 @@ interface PendingSessionData {
   documentName: string;
   documentSource: string;
   sourceDocument: string;
+  sourceDocumentLines: string[];
   timestamp: number;
 }
 
@@ -156,15 +161,7 @@ export type EndSessionParams = z.input<typeof endSessionSchema>;
  */
 export class KnowledgeStructuringSessionManager {
   private readonly sessions: Map<string, SessionData> = new Map();
-  private readonly pendingSessions: Map<
-    string,
-    {
-      documentName: string;
-      documentSource: string;
-      sourceDocument: string;
-      timestamp: number;
-    }
-  > = new Map();
+  private readonly pendingSessions: Map<string, PendingSessionData> = new Map();
   private readonly docsRoot: string;
 
   constructor(docsRoot: string) {
@@ -249,7 +246,7 @@ export class KnowledgeStructuringSessionManager {
       message: formatSessionStartResponse(
         sessionToken,
         sessionData.sectionFilepaths,
-        sessionData.sourceDocument,
+        sessionData.sourceDocumentLines,
       ),
     };
   }
@@ -276,7 +273,7 @@ export class KnowledgeStructuringSessionManager {
       isError: false,
       role: "assistant",
       message: formatSourceDocumentResponse(
-        session.sourceDocument,
+        session.sourceDocumentLines,
         sourceDocumentRange,
       ),
     };
@@ -315,7 +312,7 @@ export class KnowledgeStructuringSessionManager {
           sessionToken,
           session.sectionFilepaths,
           session.completedFilepaths,
-          showSourceDocument ? session.sourceDocument : undefined,
+          showSourceDocument ? session.sourceDocumentLines : undefined,
           sourceDocumentRange,
         ),
       };
@@ -331,7 +328,7 @@ export class KnowledgeStructuringSessionManager {
           sessionToken,
           session.sectionFilepaths,
           session.completedFilepaths,
-          showSourceDocument ? session.sourceDocument : undefined,
+          showSourceDocument ? session.sourceDocumentLines : undefined,
           sourceDocumentRange,
         ),
       };
@@ -359,7 +356,7 @@ export class KnowledgeStructuringSessionManager {
         sessionToken,
         remainingFilepaths,
         session.completedFilepaths,
-        showSourceDocument ? session.sourceDocument : undefined,
+        showSourceDocument ? session.sourceDocumentLines : undefined,
         sourceDocumentRange,
       ),
     };
@@ -429,30 +426,19 @@ export class KnowledgeStructuringSessionManager {
     // In a real implementation, we would load the source document from documentSource
     const sourceDocument = await fetchSourceDocument(documentSource);
 
+    const sourceDocumentLines = sourceDocumentToLines(sourceDocument);
+
     // Store the pending session
     this.pendingSessions.set(sessionToken, {
       documentName,
       documentSource,
       sourceDocument,
+      sourceDocumentLines,
       timestamp: Date.now(),
     });
 
-    // Generate the prompt based on IDEA.md
-    return `You are an outstanding editor, well-versed in computer science and IT, and you are good at analyzing, classifying, and structuring documents.
-Our ultimate goal is to break down a large document into sections, tag and organize them into a hierarchy of markdown files in a file tree.
-
-To get started, let's understand the outline of the document.
-Please focus on analyzing the structure of the document.
-
-1. Read the document below (Source Document) thoroughly and understand its structure.
-2. Identify the sections and subsections of the document and consider the filepath in lower-kebab-case for each. (e.g. \`/path/to/dir/getting-started.md\`).
-3. Call \`knowledgeStructuringSession.start\` with the following session token and the filepaths you considered."
-
-**Session Token:** \`${sessionToken}\`
-
-**Source Document:**
-======
-${sourceDocument}`;
+    // Generate the prompt
+    return formatInitialPrompt(sessionToken, sourceDocumentLines);
   }
 
   /**
