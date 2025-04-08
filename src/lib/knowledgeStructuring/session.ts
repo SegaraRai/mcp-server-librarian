@@ -6,13 +6,14 @@ import * as path from "node:path";
 import { z } from "zod";
 import { Answer } from "../answer.js";
 import { normalizePath } from "../normalize.js";
+import { composeContent } from "./composeContent.js";
 import {
   formatEndSessionResponse,
   formatErrorResponse,
   formatInitialPrompt,
   formatSessionStartResponse,
   formatSourceDocumentResponse,
-  formatWriteSectionResponse,
+  formatWriteSectionsResponse,
 } from "./format.js";
 import {
   fetchSourceDocument,
@@ -27,6 +28,7 @@ interface PendingSessionData {
   documentSource: string;
   sourceDocument: string;
   sourceDocumentLines: string[];
+  sourceDocumentLinesWithoutLineNumbers: string[];
   timestamp: number;
 }
 
@@ -71,6 +73,7 @@ export const showSourceDocumentSchema = z.object({
     ),
   sourceDocumentRange: z
     .string()
+    .optional()
     .describe(
       "The lines of the source document to be shown. This can be a range like `L123-L456` or `all`.",
     ),
@@ -105,41 +108,39 @@ export type ShowSourceDocumentParams = z.input<typeof showSourceDocumentSchema>;
 /**
  * Input schema for writing a section
  */
-export const writeSectionSchema = z.object({
+export const writeSectionsSchema = z.object({
   sessionToken: z
     .string()
     .describe(
       "The token for the session to be started provided in the prompt.",
     ),
-  sectionFilepath: z
-    .string()
-    .describe("The filepath of the section to be written."),
-  sectionTags: z
-    .array(z.string())
+  sections: z
+    .array(
+      z.object({
+        filepath: z
+          .string()
+          .describe("The filepath of the section to be written."),
+        tags: z
+          .array(z.string())
+          .describe(
+            "The tags to be assigned to the section. This is a list of tags in lower-kebab-case.",
+          ),
+        contentSpecifiers: z
+          .array(z.string())
+          .describe(
+            "The content specifier for the section. This is a list of content specifiers. The content specifier is a string that specifies the content of the section, for example, `@L123`, `@L123-L456`, or `=any string`.",
+          ),
+      }),
+    )
     .describe(
-      "The tags to be assigned to the section. This is a list of tags in lower-kebab-case.",
-    ),
-  sectionContent: z
-    .string()
-    .describe(
-      "The content of the section to be written. This is a markdown string.",
-    ),
-  showSourceDocument: z
-    .boolean()
-    .default(false)
-    .describe("Whether to include the source document in the response."),
-  sourceDocumentRange: z
-    .string()
-    .optional()
-    .describe(
-      "The lines of the source document to be shown. This can be a range like `L123-L456` or `all`.",
+      "The sections to be written. You can specify up to 10 items at a time.",
     ),
 });
 
 /**
- * Type for writeSection parameters
+ * Type for writeSections parameters
  */
-export type WriteSectionParams = z.input<typeof writeSectionSchema>;
+export type WriteSectionsParams = z.input<typeof writeSectionsSchema>;
 
 /**
  * Input schema for ending a session
@@ -283,15 +284,8 @@ export class KnowledgeStructuringSessionManager {
   /**
    * Write a section for a session
    */
-  async writeSection(params: WriteSectionParams): Promise<Answer> {
-    const {
-      sessionToken,
-      sectionFilepath,
-      sectionTags,
-      sectionContent,
-      showSourceDocument,
-      sourceDocumentRange,
-    } = params;
+  async writeSections(params: WriteSectionsParams): Promise<Answer> {
+    const { sessionToken, sections } = params;
 
     // Check if session exists
     const session = this.sessions.get(sessionToken);
@@ -303,66 +297,82 @@ export class KnowledgeStructuringSessionManager {
       };
     }
 
-    // Check if the filepath is already completed
-    if (session.completedFilepaths.includes(sectionFilepath)) {
-      return {
-        isError: true,
-        role: "assistant",
-        message: formatErrorResponse(
-          "The specified filepath has already been completed.",
-          sessionToken,
-          session.sectionFilepaths,
-          session.completedFilepaths,
-          showSourceDocument ? session.sourceDocumentLines : undefined,
-          sourceDocumentRange,
-        ),
-      };
+    for (const { filepath } of sections) {
+      // Check if the filepath is already completed
+      if (session.completedFilepaths.includes(filepath)) {
+        return {
+          isError: true,
+          role: "assistant",
+          message: formatErrorResponse(
+            `The specified filepath ${JSON.stringify(filepath)} has already been completed.`,
+            sessionToken,
+            session.sectionFilepaths,
+            session.completedFilepaths,
+          ),
+        };
+      }
+
+      // Check if the filepath is in the session
+      if (!session.sectionFilepaths.includes(filepath)) {
+        return {
+          isError: true,
+          role: "assistant",
+          message: formatErrorResponse(
+            `The specified filepath ${JSON.stringify(filepath)} is not part of the session.`,
+            sessionToken,
+            session.sectionFilepaths,
+            session.completedFilepaths,
+          ),
+        };
+      }
     }
 
-    // Check if the filepath is in the session
-    if (!session.sectionFilepaths.includes(sectionFilepath)) {
-      return {
-        isError: true,
-        role: "assistant",
-        message: formatErrorResponse(
-          "The specified filepath is not part of the session.",
-          sessionToken,
-          session.sectionFilepaths,
-          session.completedFilepaths,
-          showSourceDocument ? session.sourceDocumentLines : undefined,
-          sourceDocumentRange,
-        ),
-      };
+    const contentsToWrite: {
+      filepath: string;
+      actualFilepath: string;
+      content: string;
+    }[] = [];
+
+    for (const { filepath, tags, contentSpecifiers } of sections) {
+      // In a real implementation, we would write the section to the file system
+      // For now, we'll just mark it as completed
+      if (!session.completedFilepaths.includes(filepath)) {
+        session.completedFilepaths.push(filepath);
+      }
+
+      const actualFilepath = `${this.docsRoot}/${session.documentName}/${filepath.slice(session.commonPathPrefix.length)}`;
+
+      const content = composeContent(
+        contentSpecifiers,
+        session.sourceDocumentLinesWithoutLineNumbers,
+      );
+
+      contentsToWrite.push({
+        filepath,
+        actualFilepath,
+        content: `---\ntags: [${tags.map((tag) => JSON.stringify(tag)).join(", ")}]\nsource: ${JSON.stringify(session.documentSource)}\n---\n\n${content}`,
+      });
     }
 
-    // In a real implementation, we would write the section to the file system
-    // For now, we'll just mark it as completed
-    session.completedFilepaths.push(sectionFilepath);
+    for (const { actualFilepath, content } of contentsToWrite) {
+      await fsp.mkdir(path.dirname(actualFilepath), { recursive: true });
+      await fsp.writeFile(actualFilepath, content);
+    }
 
     // Calculate remaining filepaths
     const remainingFilepaths = session.sectionFilepaths.filter(
       (fp) => !session.completedFilepaths.includes(fp),
     );
 
-    const filepath = `${this.docsRoot}/${session.documentName}/${sectionFilepath.slice(session.commonPathPrefix.length)}`;
-
-    await fsp.mkdir(path.dirname(filepath), { recursive: true });
-
-    await fsp.writeFile(
-      filepath,
-      `---\ntags: [${sectionTags.map((tag) => JSON.stringify(tag)).join(", ")}]\nsource: ${JSON.stringify(session.documentSource)}\n---\n\n${sectionContent}`,
-    );
-
     // Return formatted response
     return {
       isError: false,
       role: "assistant",
-      message: formatWriteSectionResponse(
+      message: formatWriteSectionsResponse(
         sessionToken,
         remainingFilepaths,
         session.completedFilepaths,
-        showSourceDocument ? session.sourceDocumentLines : undefined,
-        sourceDocumentRange,
+        contentsToWrite,
       ),
     };
   }
@@ -439,6 +449,7 @@ export class KnowledgeStructuringSessionManager {
       documentSource,
       sourceDocument,
       sourceDocumentLines,
+      sourceDocumentLinesWithoutLineNumbers: sourceDocument.split("\n"),
       timestamp: Date.now(),
     });
 

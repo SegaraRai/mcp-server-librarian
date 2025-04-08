@@ -8,7 +8,7 @@ import {
   showSourceDocumentSchema,
   startPendingSessionSchema,
   startSessionSchema,
-  writeSectionSchema,
+  writeSectionsSchema,
 } from "./knowledgeStructuring/session.js";
 import {
   getDocumentsSchema,
@@ -301,11 +301,11 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
     server.tool(
       "knowledgeStructuringSession.writeSection",
       "Writes the extracted section to the file. Never use this tool unless you are explicitly instructed to do so in the previous tool response, as it requires a pre-generated session token.",
-      writeSectionSchema.shape,
+      writeSectionsSchema.shape,
       async (args, extra) => {
         try {
           const response =
-            await knowledgeStructuringSessionManager.writeSection(args);
+            await knowledgeStructuringSessionManager.writeSections(args);
 
           await librarian.reloadDocuments();
 

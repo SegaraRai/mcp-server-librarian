@@ -2,6 +2,17 @@
  * Utility functions for formatting knowledge structuring session responses
  */
 
+function withLineNumber(text: string, indent = ""): string {
+  const lines = text.split("\n");
+  const lineNumberWidth = String(lines.length).length;
+  return lines
+    .map(
+      (line, index) =>
+        `${indent}${String(index + 1).padStart(lineNumberWidth, " ")} | ${line}`,
+    )
+    .join("\n");
+}
+
 function formatSessionStatus(
   sessionToken: string,
   remainingFiles: readonly string[],
@@ -72,7 +83,7 @@ export function formatSessionStartResponse(
   remainingFiles: readonly string[],
   sourceDocumentLines: readonly string[],
 ): string {
-  return `OK. Call \`knowledgeStructuringSession.writeSection\` to write the structured files.
+  return `OK. Call \`knowledgeStructuringSession.writeSections\` to write the structured files.
 
 ${formatSessionStatus(sessionToken, remainingFiles, [])}`;
 }
@@ -90,23 +101,31 @@ export function formatSourceDocumentResponse(
 /**
  * Format the response for writing a section
  */
-export function formatWriteSectionResponse(
+export function formatWriteSectionsResponse(
   sessionToken: string,
   remainingFiles: readonly string[],
   completedFiles: readonly string[],
-  sourceDocumentLines?: readonly string[],
-  sourceDocumentRange?: string,
+  filesWritten: readonly { filepath: string; content: string }[],
 ): string {
   const heading =
     remainingFiles.length === 0
-      ? "OK. All files have been written. Call `knowledgeStructuringSession.end` to finish the session."
-      : "OK. Continue calling `knowledgeStructuringSession.writeSection` to write remaining files.";
+      ? "OK. All files have been written. Call `knowledgeStructuringSession.end` to finish the session. You can call `knowledgeStructuringSession.writeSections` again to correct any mistakes."
+      : "OK. Continue calling `knowledgeStructuringSession.writeSections` to write remaining files or to correct any mistakes.";
+
+  const written = filesWritten
+    .map(
+      ({ filepath, content }) =>
+        `- ${filepath}:\n\n${withLineNumber(content, "  ")}`,
+    )
+    .join("\n\n");
 
   return `${heading}
 
 ${formatSessionStatus(sessionToken, remainingFiles, completedFiles)}
 
-${sourceDocumentLines ? formatSourceDocument(sourceDocumentLines, sourceDocumentRange) : ""}`.trim();
+**Files Written:**
+
+${written}`;
 }
 
 /**
