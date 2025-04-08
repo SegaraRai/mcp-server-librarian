@@ -69,17 +69,13 @@ describe("formatDocumentListWithContents", () => {
 
     const result = formatDocumentListWithContents(docs);
     expect(result).toMatchInlineSnapshot(`
-      "**/path/to/doc1.md**
-      - tags: tag1, tag2
-      ======
-      Content of doc1
-      ======
+      "- /path/to/doc1.md
+        - tags: tag1, tag2
+        1 | Content of doc1
 
-      **/path/to/doc2.md**
-      - tags: tag2, tag3
-      ======
-      Content of doc2
-      ======"
+      - /path/to/doc2.md
+        - tags: tag2, tag3
+        1 | Content of doc2"
     `);
   });
 
@@ -90,11 +86,9 @@ describe("formatDocumentListWithContents", () => {
 
     const result = formatDocumentListWithContents(docs);
     expect(result).toMatchInlineSnapshot(`
-      "**/path/to/doc1.md**
-      - tags: tag1
-      ======
-
-      ======"
+      "- /path/to/doc1.md
+        - tags: tag1
+        1 | "
     `);
   });
 });
@@ -109,11 +103,9 @@ describe("formatDocument", () => {
 
     const result = formatDocument(doc);
     expect(result).toMatchInlineSnapshot(`
-      "**/path/to/doc.md**
-      - tags: tag1, tag2
-      ======
-      Document content
-      ======"
+      "- /path/to/doc.md
+        - tags: tag1, tag2
+        1 | Document content"
     `);
   });
 
@@ -126,11 +118,9 @@ describe("formatDocument", () => {
 
     const result = formatDocument(doc);
     expect(result).toMatchInlineSnapshot(`
-      "**/path/to/doc.md**
-      - tags: tag1, tag2
-      ======
-
-      ======"
+      "- /path/to/doc.md
+        - tags: tag1, tag2
+        1 | "
     `);
   });
 });

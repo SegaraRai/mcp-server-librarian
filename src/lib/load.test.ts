@@ -433,7 +433,9 @@ describe("getTagsInDirectory", () => {
   });
 
   it("should get tags in a specific directory", () => {
-    const tags = getTagsInDirectory(documentCache, "/tailwind");
+    // Create a mock document cache with tags in a specific directory
+    const mockCache = createNestedTagDocCache();
+    const tags = getTagsInDirectory(mockCache, "/parent");
 
     // Verify tags were found
     expect(tags.length).toBeGreaterThan(0);

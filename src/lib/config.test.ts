@@ -15,13 +15,32 @@ vi.mock("node:process", () => ({
   get env() {
     return getEnv();
   },
+  get default() {
+    return {
+      get argv() {
+        return getArgv();
+      },
+      get env() {
+        return getEnv();
+      },
+    };
+  },
 }));
 
 // Mock fs functions
-vi.mock("node:fs", () => ({
-  existsSync: vi.fn(),
-  mkdirSync: vi.fn(),
-}));
+vi.mock("node:fs", () => {
+  const existsSyncMock = vi.fn();
+  const mkdirSyncMock = vi.fn();
+  
+  return {
+    existsSync: existsSyncMock,
+    mkdirSync: mkdirSyncMock,
+    default: {
+      existsSync: existsSyncMock,
+      mkdirSync: mkdirSyncMock,
+    },
+  };
+});
 
 // Reset mocks after each test
 afterEach(() => {
@@ -74,7 +93,7 @@ describe("checkDocsRootExists", () => {
     expect(fs.existsSync).toHaveBeenCalledWith("/existing/path");
   });
 
-  it("should create the directory if it does not exist", () => {
+  it("should throw an error if the directory does not exist", () => {
     // Mock fs.existsSync to return false
     vi.mocked(fs.existsSync).mockReturnValue(false);
 
@@ -82,7 +101,9 @@ describe("checkDocsRootExists", () => {
       docsRoot: "/non-existing/path",
       enableWriteOperations: true,
     };
-    expect(() => checkDocsRootExists(config)).toThrow();
+    expect(() => checkDocsRootExists(config)).toThrow(
+      "Docs root directory does not exist: /non-existing/path"
+    );
 
     // Verify existsSync was called
     expect(fs.existsSync).toHaveBeenCalledWith("/non-existing/path");

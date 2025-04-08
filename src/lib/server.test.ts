@@ -83,7 +83,7 @@ describe("createLibrarianServer", () => {
       name: "Librarian",
       version: "1.0.0",
       description:
-        "A server for listing, searching, and retrieving documents curated exclusively for the project. If you want to know about project-specific knowledge or rules, you should first use the tools on this server to acquire the knowledge you need.",
+        "A server for listing, searching, and retrieving documents curated exclusively for the project. If you want to know about project-specific knowledge or rules, you should first use the `overview` tool on this server to acquire the knowledge you need.",
     });
   });
 
@@ -112,16 +112,7 @@ describe("createLibrarianServer", () => {
   it("should register the getDocuments tool", () => {
     expect(server.tool).toHaveBeenCalledWith(
       "getDocuments",
-      "Retrieves documents in the specified directory (defaults to the root dir), optionally filtering by tags and including contents.",
-      expect.anything(),
-      expect.any(Function),
-    );
-  });
-
-  it("should register the getDocuments tool", () => {
-    expect(server.tool).toHaveBeenCalledWith(
-      "getDocuments",
-      "Retrieves documents in the specified directory (defaults to the root dir), optionally filtering by tags and including contents.",
+      "Retrieves documents specified by their file paths. Since each document is small enough, please try to get as many documents as possible at once.",
       expect.anything(),
       expect.any(Function),
     );
