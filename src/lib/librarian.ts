@@ -2,6 +2,7 @@
  * Core Librarian implementation
  */
 import { z } from "zod";
+import { KnowledgeStructuringSessionManager } from "./knowledgeStructuring/session.js";
 import { LibrarianConfig } from "./config.js";
 import {
   Document,
@@ -129,9 +130,11 @@ export class Librarian {
   private readonly config: LibrarianConfig;
   private documentCache: DocumentCache | null = null;
   private loading: Promise<DocumentCache> | null = null;
+  private knowledgeStructuringSessionManager: KnowledgeStructuringSessionManager;
 
   constructor(config: LibrarianConfig) {
     this.config = config;
+    this.knowledgeStructuringSessionManager = new KnowledgeStructuringSessionManager(config.docsRoot);
   }
 
   /**
@@ -244,5 +247,12 @@ export class Librarian {
     const cache = await this.ensureDocumentsLoaded();
 
     return getTagsInDirectory(cache, directory, includeFilepaths, depth);
+  }
+
+  /**
+   * Get the knowledge structuring session manager
+   */
+  getKnowledgeStructuringSessionManager(): KnowledgeStructuringSessionManager {
+    return this.knowledgeStructuringSessionManager;
   }
 }

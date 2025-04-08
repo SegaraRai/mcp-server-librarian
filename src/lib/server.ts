@@ -12,6 +12,12 @@ import {
   searchDocumentsSchema,
 } from "./librarian.js";
 import {
+  endSessionSchema,
+  showSourceDocumentSchema,
+  startSessionSchema,
+  writeSectionSchema,
+} from "./knowledgeStructuring/session.js";
+import {
   formatDocument,
   formatDocumentList,
   formatDocumentListWithContents,
@@ -193,6 +199,130 @@ export function createLibrarianServer(config: LibrarianConfig): McpServer {
       };
     }
   });
+// Add knowledgeStructuringSession.start tool
+server.tool(
+  "knowledgeStructuringSession.start",
+  startSessionSchema.shape,
+  async (args, extra) => {
+    try {
+      const response = await librarian.getKnowledgeStructuringSessionManager().startSession(args);
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: response,
+          },
+        ],
+      };
+    } catch (error: any) {
+      console.error("Error in knowledgeStructuringSession.start:", error);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to start knowledge structuring session: ${error.message || "Unknown error"}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  },
+);
 
-  return server;
+// Add knowledgeStructuringSession.showSourceDocument tool
+server.tool(
+  "knowledgeStructuringSession.showSourceDocument",
+  showSourceDocumentSchema.shape,
+  async (args, extra) => {
+    try {
+      const response = await librarian.getKnowledgeStructuringSessionManager().showSourceDocument(args);
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: response,
+          },
+        ],
+      };
+    } catch (error: any) {
+      console.error("Error in knowledgeStructuringSession.showSourceDocument:", error);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to show source document: ${error.message || "Unknown error"}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  },
+);
+
+// Add knowledgeStructuringSession.writeSection tool
+server.tool(
+  "knowledgeStructuringSession.writeSection",
+  writeSectionSchema.shape,
+  async (args, extra) => {
+    try {
+      const response = await librarian.getKnowledgeStructuringSessionManager().writeSection(args);
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: response,
+          },
+        ],
+      };
+    } catch (error: any) {
+      console.error("Error in knowledgeStructuringSession.writeSection:", error);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to write section: ${error.message || "Unknown error"}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  },
+);
+
+// Add knowledgeStructuringSession.end tool
+server.tool(
+  "knowledgeStructuringSession.end",
+  endSessionSchema.shape,
+  async (args, extra) => {
+    try {
+      const response = await librarian.getKnowledgeStructuringSessionManager().endSession(args);
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: response,
+          },
+        ],
+      };
+    } catch (error: any) {
+      console.error("Error in knowledgeStructuringSession.end:", error);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to end knowledge structuring session: ${error.message || "Unknown error"}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  },
+);
+
+return server;
 }
+
