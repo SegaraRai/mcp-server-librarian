@@ -2,6 +2,7 @@
  * Knowledge Structuring Session Manager
  */
 import * as fsp from "node:fs/promises";
+import * as path from "node:path";
 import { z } from "zod";
 import { Answer } from "../answer.js";
 import { normalizePath } from "../normalize.js";
@@ -343,8 +344,12 @@ export class KnowledgeStructuringSessionManager {
       (fp) => !session.completedFilepaths.includes(fp),
     );
 
+    const filepath = `${this.docsRoot}/${session.documentName}/${sectionFilepath.slice(session.commonPathPrefix.length)}`;
+
+    await fsp.mkdir(path.dirname(filepath), { recursive: true });
+
     await fsp.writeFile(
-      `${this.docsRoot}/${session.documentName}/${sectionFilepath.slice(session.commonPathPrefix.length)}`,
+      filepath,
       `---\ntags: [${sectionTags.map((tag) => JSON.stringify(tag)).join(", ")}]\nsource: ${JSON.stringify(session.documentSource)}\n---\n\n${sectionContent}`,
     );
 
